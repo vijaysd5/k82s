@@ -1,0 +1,1440 @@
+=~=~=~=~=~=~=~=~=~=~=~= PuTTY log 2022.04.28 23:47:51 =~=~=~=~=~=~=~=~=~=~=~=
+clear
+[3J[H[2J]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# cd ..
+]0;root@ip-172-31-31-150:~/kubernetes-training[root@ip-172-31-31-150 kubernetes-training]# cd [K[K[Kcd ..
+]0;root@ip-172-31-31-150:~[root@ip-172-31-31-150 ~]# clear
+[3J[H[2J]0;root@ip-172-31-31-150:~[root@ip-172-31-31-150 ~]# pwd
+/root
+]0;root@ip-172-31-31-150:~[root@ip-172-31-31-150 ~]# ls
+[0m[01;34mkubernetes-training[0m
+]0;root@ip-172-31-31-150:~[root@ip-172-31-31-150 ~]# cd kubernetes-training/
+]0;root@ip-172-31-31-150:~/kubernetes-training[root@ip-172-31-31-150 kubernetes-training]# ls
+00installation.md            [0m[01;34m13-networking[0m
+[01;34m01-Getting-started[0m           [01;34m14-security[0m
+01gettingstartedWithKube.md  [01;34m15-calico[0m
+[01;34m03-Pods[0m                      [01;34m16-dashboard[0m
+03-pods.md                   16-dashboard-setup.md
+[01;34m04-controllers[0m               Deployments.md
+04-controllers.md            heapster.md
+[01;34m05-services[0m                  [01;34mhelm[0m
+05-services.md               history.txt
+[01;34m06-storage[0m                   ingress.md
+06-volumes.md                installation-multi-node-master.md
+07-configmap.md              Istio-setup.md
+[01;34m07-configmaps-and-secrets[0m    [01;34mKubernetes-slides[0m
+[01;34m08-metadata[0m                  kubernetes-troubleshooting.md
+[01;34m09-deployments[0m               prometheus-setup.md
+[01;34m10 Stateful Set[0m              README.md
+[01;34m11-RBAC[0m                      Working with MiniKube.md
+[01;34m12-cluster-admintration[0m
+]0;root@ip-172-31-31-150:~/kubernetes-training[root@ip-172-31-31-150 kubernetes-training]# cd 04-controllers/
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# ls
+[0m[01;34mbatch-job[0m
+batch-job.yaml
+cronjob.yaml
+kubia-liveness-probe-initial-delay.yaml
+kubia-liveness-probe.yaml
+kubia-rc.yaml
+kubia-replicaset-matchexpressions.yaml
+kubia-replicaset.yaml
+[01;34mkubia-unhealthy[0m
+multi-completion-batch-job.yaml
+multi-completion-parallel-batch-job.yaml
+[01;34mssd-monitor[0m
+ssd-monitor-daemonset.yaml
+time-limited-batch-job.yaml
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# cat kubia-rc.yaml 
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: kubia2-vj1
+spec:
+  replicas: 3
+  selector:
+      app: kubia
+  template:
+    metadata:
+      labels:
+        app: kubia
+    spec:
+      containers:
+      - name: kubia
+        image: luksa/kubia
+        ports:
+        - containerPort: 8080
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# cat kubia-replicaset.yaml 
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: kubia-vj
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: kubia
+  template:
+    metadata:
+      labels:
+        app: kubia
+    spec:
+      containers:
+      - name: kubia
+        image: luksa/kubia
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# TMOUT=0
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl appl[K[K[K[Kget pods
+NAME               READY   STATUS    RESTARTS   AGE
+kubia-vj-49twt     1/1     Running   0          27m
+kubia-vj-nz5cd     1/1     Running   0          34m
+kubia-vj-sxknp     1/1     Running   0          36m
+kubia-vj-vscqz     1/1     Running   0          36m
+kubia2-vj-hp6rg    1/1     Running   0          6d13h
+kubia2-vj-pmpkd    1/1     Running   0          6d13h
+kubia2-vj1-z8scg   1/1     Running   0          173m
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubect[K[K[K[K[K[Kkubecl[Ktl delete all --all
+pod "kubia-vj-49twt" deleted
+pod "kubia-vj-nz5cd" deleted
+pod "kubia-vj-sxknp" deleted
+pod "kubia-vj-vscqz" deleted
+pod "kubia2-vj-hp6rg" deleted
+pod "kubia2-vj-pmpkd" deleted
+pod "kubia2-vj1-z8scg" deleted
+replicationcontroller "kubia2-vj" deleted
+replicationcontroller "kubia2-vj1" deleted
+service "kubia2" deleted
+replicaset.apps "kubia-vj" deleted
+^C
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# pwd
+/root/kubernetes-training/04-controllers
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# ls
+[0m[01;34mbatch-job[0m
+batch-job.yaml
+cronjob.yaml
+kubia-liveness-probe-initial-delay.yaml
+kubia-liveness-probe.yaml
+kubia-rc.yaml
+kubia-replicaset-matchexpressions.yaml
+kubia-replicaset.yaml
+[01;34mkubia-unhealthy[0m
+multi-completion-batch-job.yaml
+multi-completion-parallel-batch-job.yaml
+[01;34mssd-monitor[0m
+ssd-monitor-daemonset.yaml
+time-limited-batch-job.yaml
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl apply -f kuboi[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[Kvi kubia-r
+kubia-rc.yaml
+kubia-replicaset-matchexpressions.yaml
+kubia-replicaset.yaml
+[root@ip-172-31-31-150 04-controllers]# vi kubia-rc.yaml 
+[?1049h[>4;2m[?1h=[?2004h[?1004h[1;44r[?12h[?12l[22;2t[22;1t[27m[23m[29m[m[H[2J[?25l[44;1H"kubia-rc.yaml" 18L, 300B[2;1H▽[6n[2;1H  [3;1HPzz\[0%m[6n[3;1H           [1;1H[>c]10;?]11;?[1;1H[36mapiVersion[m[35m:[m v1
+[36mkind[m[35m:[m ReplicationController[2;28H[K[3;1H[36mmetadata[m[35m:[m[3;10H[K[4;3H[36mname[m[35m:[m kubia2-vj1
+[36mspec[m[35m:[m
+  [36mreplicas[m[35m:[m [31m3[m
+  [36mselector[m[35m:[m[8;7H[36mapp[m[35m:[m kubia
+  [36mtemplate[m[35m:[m
+    [36mmetadata[m[35m:[m[11;7H[36mlabels[m[35m:[m[12;9H[36mapp[m[35m:[m kubia
+    [36mspec[m[35m:[m[14;7H[36mcontainers[m[35m:[m[15;7H[33m- [m[36mname[m[35m:[m kubia[16;9H[36mimage[m[35m:[m luksa/kubia[17;9H[36mports[m[35m:[m[18;9H[33m- [m[36mcontainerPort[m[35m:[m [31m8080[m
+[1m[34m~                                                                               [20;1H~                                                                               [21;1H~                                                                               [22;1H~                                                                               [23;1H~                                                                               [24;1H~                                                                               [25;1H~                                                                               [26;1H~                                                                               [27;1H~                                                                               [28;1H~                                                                               [29;1H~                                                                               [30;1H~                                                                               [31;1H~                                                                               [32;1H~                                                                               [33;1H~                                                                               [34;1H~                                                                               [35;1H~                                                                               [36;1H~                                                                               [37;1H~                                                                               [38;1H~                                                                               [39;1H~                                                                               [40;1H~                                                                               [41;1H~                                                                               [42;1H~                                                                               [43;1H~                                                                               [m[44;63H4,18[10CAll[4;18H[?25h[?25l[44;53Hi[4;18H[44;53H [4;18H[44;1H[1m-- INSERT --[m[44;13H[K[44;63H4,18[10CAll[4;18H[?25h[?25l[4;18H[K[4;18H[?25h[44;1H[K[4;17H[?25l[44;53H^[[4;17H[44;53H  [4;18H[44;63H4,17[10CAll[4;17H[?25h[?25l[44;53H:[4;17H[44;53H[K[44;1H:[?25hwq![?25l[?2004l[>4;m"kubia-rc.yaml" 18L, 299B written[23;2t[23;1t
+[?1004l[?2004l[?1l>[?25h[>4;m[?1049l]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl apply -f kubia-rc.yaml 
+replicationcontroller/kubia2-vj created
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl apply -f kubia-rc.yaml [14Pvi[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cls[Kpwdkubectl delete all --all[8Pget pods
+NAME              READY   STATUS              RESTARTS   AGE
+kubia2-vj-d4fx5   0/1     ContainerCreating   0          8s
+kubia2-vj-j2g25   1/1     Running             0          8s
+kubia2-vj-nx7ns   0/1     ContainerCreating   0          8s
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl get pods
+NAME              READY   STATUS    RESTARTS   AGE
+kubia2-vj-d4fx5   1/1     Running   0          12s
+kubia2-vj-j2g25   1/1     Running   0          12s
+kubia2-vj-nx7ns   1/1     Running   0          12s
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl get podsapply -f kubia-rc.yaml [14Pvi[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cls[Kpwdkubectl delete all --all[K[K[K[K[K[K[K[K[Kkubia2-vj-d4fx5
+error: the server doesn't have a resource type "kubia2-vj-d4fx5"
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl delete kubia2-vj-d4fx5[14Pget podsapply -f kubia-rc.yaml [14Pvi[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
+[?1049h[>4;2m[?1h=[?2004h[?1004h[1;44r[?12h[?12l[22;2t[22;1t[27m[23m[29m[m[H[2J[?25l[44;1H"kubia-rc.yaml" 18L, 299B[2;1H▽[6n[2;1H  [3;1HPzz\[0%m[6n[3;1H           [1;1H[>c]10;?]11;?[1;1H[36mapiVersion[m[35m:[m v1
+[36mkind[m[35m:[m ReplicationController[2;28H[K[3;1H[36mmetadata[m[35m:[m[3;10H[K[4;3H[36mname[m[35m:[m kubia2-vj
+[36mspec[m[35m:[m
+  [36mreplicas[m[35m:[m [31m3[m
+  [36mselector[m[35m:[m[8;7H[36mapp[m[35m:[m kubia
+  [36mtemplate[m[35m:[m
+    [36mmetadata[m[35m:[m[11;7H[36mlabels[m[35m:[m[12;9H[36mapp[m[35m:[m kubia
+    [36mspec[m[35m:[m[14;7H[36mcontainers[m[35m:[m[15;7H[33m- [m[36mname[m[35m:[m kubia[16;9H[36mimage[m[35m:[m luksa/kubia[17;9H[36mports[m[35m:[m[18;9H[33m- [m[36mcontainerPort[m[35m:[m [31m8080[m
+[1m[34m~                                                                               [20;1H~                                                                               [21;1H~                                                                               [22;1H~                                                                               [23;1H~                                                                               [24;1H~                                                                               [25;1H~                                                                               [26;1H~                                                                               [27;1H~                                                                               [28;1H~                                                                               [29;1H~                                                                               [30;1H~                                                                               [31;1H~                                                                               [32;1H~                                                                               [33;1H~                                                                               [34;1H~                                                                               [35;1H~                                                                               [36;1H~                                                                               [37;1H~                                                                               [38;1H~                                                                               [39;1H~                                                                               [40;1H~                                                                               [41;1H~                                                                               [42;1H~                                                                               [43;1H~                                                                               [m[44;63H4,17[10CAll[4;17H[?25h[?25l[44;53H^[[4;17H[44;53H  [4;17H[44;53H^[[4;17H[44;53H  [4;17H[?25h[?25l[44;53H:[4;17H[44;1H[K[44;1H:[?25hq![?25l[?2004l[>4;m[23;2t[23;1t[44;1H[K[44;1H[?1004l[?2004l[?1l>[?25h[>4;m[?1049l]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# vi kubia-rc.yaml kubectl delete kubia2-vj-d4fx5pkubia2-vj-d4fx5okubia2-vj-d4fx5dkubia2-vj-d4fx5 kubia2-vj-d4fx5
+pod "kubia2-vj-d4fx5" deleted
+^[[A^[[B^C
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl delete pod kubia2-vj-d4fx5[17Pvi kubia-rc.yaml kubectl delete kubia2-vj-d4fx5[14Pget pods
+NAME              READY   STATUS        RESTARTS   AGE
+kubia2-vj-d4fx5   1/1     Terminating   0          93s
+kubia2-vj-dqn9h   1/1     Running       0          7s
+kubia2-vj-j2g25   1/1     Running       0          93s
+kubia2-vj-nx7ns   1/1     Running       0          93s
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl get podsdelete pod kubia2-vj-d4fx5[17Pvi kubia-rc.yaml kubectl delete kubia2-vj-d4fx5[14Pget podsapply -f kubia-rc.yaml [14Pvi[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cls[Kpwd[1Plsvi kubia-rc.yaml [14@kubectl apply -f[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[15Pget podsapply -f kubia-rc.yaml [1P[1P[1P[1P[1P[1P[1P[1P[1P[1P[1@ [1@s[1@c[1@a[1@l[1@e[1@ [1@r[1@c[1@ [C[C[C[C[C[C[C[C[C[C[C[C[C[C[K[K[K[K[K[K[K[K[K2-vj --replicas=1
+replicationcontroller/kubia2-vj scaled
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl scale rc kubia2-vj --replicas=1get pods[K
+NAME              READY   STATUS        RESTARTS   AGE
+kubia2-vj-dqn9h   1/1     Terminating   0          103s
+kubia2-vj-j2g25   1/1     Running       0          3m9s
+kubia2-vj-nx7ns   1/1     Terminating   0          3m9s
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl get pods
+NAME              READY   STATUS        RESTARTS   AGE
+kubia2-vj-dqn9h   1/1     Terminating   0          105s
+kubia2-vj-j2g25   1/1     Running       0          3m11s
+kubia2-vj-nx7ns   1/1     Terminating   0          3m11s
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl get pods
+NAME              READY   STATUS        RESTARTS   AGE
+kubia2-vj-dqn9h   1/1     Terminating   0          107s
+kubia2-vj-j2g25   1/1     Running       0          3m13s
+kubia2-vj-nx7ns   1/1     Terminating   0          3m13s
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl get pods\[K
+NAME              READY   STATUS        RESTARTS   AGE
+kubia2-vj-dqn9h   1/1     Terminating   0          111s
+kubia2-vj-j2g25   1/1     Running       0          3m17s
+kubia2-vj-nx7ns   1/1     Terminating   0          3m17s
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl get podsscale rc kubia2-vj --replicas=1get pods[Kdelete pod kubia2-vj-d4fx5[17Pvi kubia-rc.yaml [1P[1@e[8@plicaset
+[?1049h[>4;2m[?1h=[?2004h[?1004h[1;44r[?12h[?12l[22;2t[22;1t[27m[23m[29m[m[H[2J[?25l[44;1H"kubia-replicaset.yaml" 17L, 264B[2;1H▽[6n[2;1H  [3;1HPzz\[0%m[6n[3;1H           [1;1H[>c]10;?]11;?[1;1H[36mapiVersion[m[35m:[m apps/v1
+[36mkind[m[35m:[m ReplicaSet[2;17H[K[3;1H[36mmetadata[m[35m:[m[3;10H[K[4;3H[36mname[m[35m:[m kubia-vj
+[36mspec[m[35m:[m
+  [36mreplicas[m[35m:[m [31m3[m
+  [36mselector[m[35m:[m
+    [36mmatchLabels[m[35m:[m[9;7H[36mapp[m[35m:[m kubia
+  [36mtemplate[m[35m:[m
+    [36mmetadata[m[35m:[m[12;7H[36mlabels[m[35m:[m[13;9H[36mapp[m[35m:[m kubia
+    [36mspec[m[35m:[m[15;7H[36mcontainers[m[35m:[m[16;7H[33m- [m[36mname[m[35m:[m kubia[17;9H[36mimage[m[35m:[m luksa/kubia
+[1m[34m~                                                                               [19;1H~                                                                               [20;1H~                                                                               [21;1H~                                                                               [22;1H~                                                                               [23;1H~                                                                               [24;1H~                                                                               [25;1H~                                                                               [26;1H~                                                                               [27;1H~                                                                               [28;1H~                                                                               [29;1H~                                                                               [30;1H~                                                                               [31;1H~                                                                               [32;1H~                                                                               [33;1H~                                                                               [34;1H~                                                                               [35;1H~                                                                               [36;1H~                                                                               [37;1H~                                                                               [38;1H~                                                                               [39;1H~                                                                               [40;1H~                                                                               [41;1H~                                                                               [42;1H~                                                                               [43;1H~                                                                               [m[44;63H1,19[10CAll[1;19H[?25h[?25l[44;53H^[[1;19H[44;53H  [1;19H[44;53H^[[1;19H[44;53H  [1;19H[?25h[?25l[44;53H:[1;19H[44;1H[K[44;1H:[?25hq![?25l[?2004l[>4;m[23;2t[23;1t[44;1H[K[44;1H[?1004l[?2004l[?1l>[?25h[>4;m[?1049l]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# vi kubia-replicaset.yaml [9Pkubectl get podsscale rc kubia2-vj --replicas=1get pods[Kscale rc kubia2-vj --replicas=1get pods[Kdelete pod kubia2-vj-d4fx5[17Pvi kubia-rc.yaml kubectl delete kubia2-vj-d4fx5[14Pget podsapply -f kubia-rc.yaml [1P[1@e[8@plicaset
+replicaset.apps/kubia-vj created
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl apply -f kubia-replicaset.yaml [14Pvi[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[9Pkubectl get pods
+NAME              READY   STATUS              RESTARTS   AGE
+kubia-vj-bskbm    0/1     ContainerCreating   0          8s
+kubia-vj-k4rsk    1/1     Running             0          8s
+kubia-vj-rhcq2    0/1     ContainerCreating   0          8s
+kubia2-vj-j2g25   1/1     Running             0          4m17s
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl get pods
+NAME              READY   STATUS    RESTARTS   AGE
+kubia-vj-bskbm    1/1     Running   0          36s
+kubia-vj-k4rsk    1/1     Running   0          36s
+kubia-vj-rhcq2    1/1     Running   0          36s
+kubia2-vj-j2g25   1/1     Running   0          4m45s
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl get podsapply -f kubia-replicaset.yaml [14Pvi[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
+[?1049h[>4;2m[?1h=[?2004h[?1004h[1;44r[?12h[?12l[22;2t[22;1t[27m[23m[29m[m[H[2J[?25l[44;1H"kubia-replicaset.yaml" 17L, 264B[2;1H▽[6n[2;1H  [3;1HPzz\[0%m[6n[3;1H           [1;1H[>c]10;?]11;?[1;1H[36mapiVersion[m[35m:[m apps/v1
+[36mkind[m[35m:[m ReplicaSet[2;17H[K[3;1H[36mmetadata[m[35m:[m[3;10H[K[4;3H[36mname[m[35m:[m kubia-vj
+[36mspec[m[35m:[m
+  [36mreplicas[m[35m:[m [31m3[m
+  [36mselector[m[35m:[m
+    [36mmatchLabels[m[35m:[m[9;7H[36mapp[m[35m:[m kubia
+  [36mtemplate[m[35m:[m
+    [36mmetadata[m[35m:[m[12;7H[36mlabels[m[35m:[m[13;9H[36mapp[m[35m:[m kubia
+    [36mspec[m[35m:[m[15;7H[36mcontainers[m[35m:[m[16;7H[33m- [m[36mname[m[35m:[m kubia[17;9H[36mimage[m[35m:[m luksa/kubia
+[1m[34m~                                                                               [19;1H~                                                                               [20;1H~                                                                               [21;1H~                                                                               [22;1H~                                                                               [23;1H~                                                                               [24;1H~                                                                               [25;1H~                                                                               [26;1H~                                                                               [27;1H~                                                                               [28;1H~                                                                               [29;1H~                                                                               [30;1H~                                                                               [31;1H~                                                                               [32;1H~                                                                               [33;1H~                                                                               [34;1H~                                                                               [35;1H~                                                                               [36;1H~                                                                               [37;1H~                                                                               [38;1H~                                                                               [39;1H~                                                                               [40;1H~                                                                               [41;1H~                                                                               [42;1H~                                                                               [43;1H~                                                                               [m[44;63H1,19[10CAll[1;19H[?25h[?25l[44;53H:[1;19H[44;1H[K[44;1H:[?25hq![?25l[?2004l[>4;m[23;2t[23;1t[44;1H[K[44;1H[?1004l[?2004l[?1l>[?25h[>4;m[?1049l]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# vi kubia-replicaset.yaml [9Pkubectl get podsapply -f kubia-replicaset.yaml [14Pvi[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[9Pkubectl get podsscale rc kubia2-vj --replicas=1get pods[Kdelete pod kubia2-vj-d4fx5[K[K[K[K[Kbskbm[1P-vj-bskbm
+pod "kubia-vj-bskbm" deleted
+^C
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl delete pod kubia-vj-bskbm[8Pvi kubia-replicaset.yaml [9Pkubectl get pods
+NAME              READY   STATUS        RESTARTS   AGE
+kubia-vj-bskbm    1/1     Terminating   0          82s
+kubia-vj-k4rsk    1/1     Running       0          82s
+kubia-vj-rhcq2    1/1     Running       0          82s
+kubia-vj-t2clw    1/1     Running       0          6s
+kubia2-vj-j2g25   1/1     Running       0          5m31s
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl get pods[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[Kkubectl label pods kubia-manual-kalyan e nv=canary --overwrite[1P --overwrite[C[C[C[C[C[C[C[C[1P --overwrite[C[C[C[C[C[C[C[1P --overwrite[C[C[C[C[C[C[1P --overwrite[C[C[C[C[C[1P --overwrite[C[C[C[C[1P --overwrite[C[C[Cv --overwrite[C[C[C[Cj --overwrite[C[C[C[C[C[1P[1P[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C=v[1P[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ca=[1@v[1@p[1@p[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app[1P[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=[1P[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=v[1P[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj[1P --overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj [1P--overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj -[C[1Poverwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj --[1Poverwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj --o[1Pverwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj --ov[1Perwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj --ove[1Prwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj --over[1Pwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj --overw[1Prite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj --overwr[1Pite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj --overwri[1Pte[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C2 app=vj --overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C- app=vj --overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cv app=vj --overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cj app=vj --overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
+
+Error from server (NotFound): pods "kubia2-vj" not found
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl label pods kubia2-vj app=vj --oveerwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cget pods[K
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cdelete pod kubia-vj-bskbm[8Pvi kubia-replicaset.yaml 
+[?1049h[>4;2m[?1h=[?2004h[?1004h[1;44r[?12h[?12l[22;2t[22;1t[27m[23m[29m[m[H[2J[?25l[44;1H"kubia-replicaset.yaml" 17L, 264B[2;1H▽[6n[2;1H  [3;1HPzz\[0%m[6n[3;1H           [1;1H[>c]10;?]11;?[1;1H[36mapiVersion[m[35m:[m apps/v1
+[36mkind[m[35m:[m ReplicaSet[2;17H[K[3;1H[36mmetadata[m[35m:[m[3;10H[K[4;3H[36mname[m[35m:[m kubia-vj
+[36mspec[m[35m:[m
+  [36mreplicas[m[35m:[m [31m3[m
+  [36mselector[m[35m:[m
+    [36mmatchLabels[m[35m:[m[9;7H[36mapp[m[35m:[m kubia
+  [36mtemplate[m[35m:[m
+    [36mmetadata[m[35m:[m[12;7H[36mlabels[m[35m:[m[13;9H[36mapp[m[35m:[m kubia
+    [36mspec[m[35m:[m[15;7H[36mcontainers[m[35m:[m[16;7H[33m- [m[36mname[m[35m:[m kubia[17;9H[36mimage[m[35m:[m luksa/kubia
+[1m[34m~                                                                               [19;1H~                                                                               [20;1H~                                                                               [21;1H~                                                                               [22;1H~                                                                               [23;1H~                                                                               [24;1H~                                                                               [25;1H~                                                                               [26;1H~                                                                               [27;1H~                                                                               [28;1H~                                                                               [29;1H~                                                                               [30;1H~                                                                               [31;1H~                                                                               [32;1H~                                                                               [33;1H~                                                                               [34;1H~                                                                               [35;1H~                                                                               [36;1H~                                                                               [37;1H~                                                                               [38;1H~                                                                               [39;1H~                                                                               [40;1H~                                                                               [41;1H~                                                                               [42;1H~                                                                               [43;1H~                                                                               [m[44;63H1,19[10CAll[1;19H[?25h[?25l[44;1HType  :qa  and press <Enter> to exit Vim[44;63H[K[44;63H1,19[10CAll[1;19H[?25h[?25l[44;53H:[1;19H[44;1H[K[44;1H:[?25hq![?25l[?2004l[>4;m[23;2t[23;1t[44;1H[K[44;1H[?1004l[?2004l[?1l>[?25h[>4;m[?1049l]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# vi kubia-replicaset.yaml [Kvi kubia-replicaset.yaml kubectl label pods kubia2-vj app=vj --oveerwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cget pods[K
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Clabel pods kubia2-vj app=vj --oveerwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C-vj app=vj --over[1Pwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
+
+Error from server (NotFound): pods "kubia-vj" not found
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl label pods kubia-vj app=vj --overrwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C- app=vj --overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cb app=vj --overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cs app=vj --overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cb app=vj --overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ck app=vj --overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cm app=vj [C-overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj -[C[1Poverwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj --[1Poverwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj --o[1Pverwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ck app=vj --overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cb app=vj --overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cm app=vj [C-overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
+
+Error from server (NotFound): pods "kubia-vj-bskbm" not found
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl label pods kubia-vj-bskbm app=vj  --overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj -[C[1Poverwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj --[1Poverwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj --o[1Pverwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj --ov[1Perwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj --ove[1Prwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj --over[1Pwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
+
+Error from server (NotFound): pods "kubia-vj" not found
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl label pods kubia-vj app=vj --overrwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C-bskbm app=vj --overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj --over[6Pwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[15Pvi kubia-replicaset.yaml 
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
+[?1049h[>4;2m[?1h=[?2004h[?1004h[1;44r[?12h[?12l[22;2t[22;1t[27m[23m[29m[m[H[2J[?25l[44;1H"kubia-replicaset.yaml" 17L, 264B[2;1H▽[6n[2;1H  [3;1HPzz\[0%m[6n[3;1H           [1;1H[>c]10;?]11;?[1;1H[36mapiVersion[m[35m:[m apps/v1
+[36mkind[m[35m:[m ReplicaSet[2;17H[K[3;1H[36mmetadata[m[35m:[m[3;10H[K[4;3H[36mname[m[35m:[m kubia-vj
+[36mspec[m[35m:[m
+  [36mreplicas[m[35m:[m [31m3[m
+  [36mselector[m[35m:[m
+    [36mmatchLabels[m[35m:[m[9;7H[36mapp[m[35m:[m kubia
+  [36mtemplate[m[35m:[m
+    [36mmetadata[m[35m:[m[12;7H[36mlabels[m[35m:[m[13;9H[36mapp[m[35m:[m kubia
+    [36mspec[m[35m:[m[15;7H[36mcontainers[m[35m:[m[16;7H[33m- [m[36mname[m[35m:[m kubia[17;9H[36mimage[m[35m:[m luksa/kubia
+[1m[34m~                                                                               [19;1H~                                                                               [20;1H~                                                                               [21;1H~                                                                               [22;1H~                                                                               [23;1H~                                                                               [24;1H~                                                                               [25;1H~                                                                               [26;1H~                                                                               [27;1H~                                                                               [28;1H~                                                                               [29;1H~                                                                               [30;1H~                                                                               [31;1H~                                                                               [32;1H~                                                                               [33;1H~                                                                               [34;1H~                                                                               [35;1H~                                                                               [36;1H~                                                                               [37;1H~                                                                               [38;1H~                                                                               [39;1H~                                                                               [40;1H~                                                                               [41;1H~                                                                               [42;1H~                                                                               [43;1H~                                                                               [m[44;63H1,19[10CAll[1;19H[?25h[?25l[44;53H^[[1;19H[44;53H  [1;19H[44;53H^[[1;19H[44;53H  [1;19H[?25h[?25l[44;53H:[1;19H[44;1H[K[44;1H:[?25hq![?25l[?2004l[>4;m[23;2t[23;1t[44;1H[K[44;1H[?1004l[?2004l[?1l>[?25h[>4;m[?1049l]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# vi kubia-replicaset.yaml kubectl label pods kubia-vj app=vj --overrwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C-bskbm app=vj --overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj --over[6Pwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[15Pvi kubia-replicaset.yaml 
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ckubectl label pods kubia2-vj app=vj --oveerwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cget pods[K
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cdelete pod kubia-vj-bskbm[8Pvi kubia-replicaset.yaml [9Pkubectl get podsvi kubia-replicaset.yaml [1P[1P[1P[1P[1P[1P[1P[1P[1P[1@c
+[?1049h[>4;2m[?1h=[?2004h[?1004h[1;44r[?12h[?12l[22;2t[22;1t[27m[23m[29m[m[H[2J[?25l[44;1H"kubia-rc.yaml" 18L, 299B[2;1H▽[6n[2;1H  [3;1HPzz\[0%m[6n[3;1H           [1;1H[>c]10;?]11;?[1;1H[36mapiVersion[m[35m:[m v1
+[36mkind[m[35m:[m ReplicationController[2;28H[K[3;1H[36mmetadata[m[35m:[m[3;10H[K[4;3H[36mname[m[35m:[m kubia2-vj
+[36mspec[m[35m:[m
+  [36mreplicas[m[35m:[m [31m3[m
+  [36mselector[m[35m:[m[8;7H[36mapp[m[35m:[m kubia
+  [36mtemplate[m[35m:[m
+    [36mmetadata[m[35m:[m[11;7H[36mlabels[m[35m:[m[12;9H[36mapp[m[35m:[m kubia
+    [36mspec[m[35m:[m[14;7H[36mcontainers[m[35m:[m[15;7H[33m- [m[36mname[m[35m:[m kubia[16;9H[36mimage[m[35m:[m luksa/kubia[17;9H[36mports[m[35m:[m[18;9H[33m- [m[36mcontainerPort[m[35m:[m [31m8080[m
+[1m[34m~                                                                               [20;1H~                                                                               [21;1H~                                                                               [22;1H~                                                                               [23;1H~                                                                               [24;1H~                                                                               [25;1H~                                                                               [26;1H~                                                                               [27;1H~                                                                               [28;1H~                                                                               [29;1H~                                                                               [30;1H~                                                                               [31;1H~                                                                               [32;1H~                                                                               [33;1H~                                                                               [34;1H~                                                                               [35;1H~                                                                               [36;1H~                                                                               [37;1H~                                                                               [38;1H~                                                                               [39;1H~                                                                               [40;1H~                                                                               [41;1H~                                                                               [42;1H~                                                                               [43;1H~                                                                               [m[44;63H4,17[10CAll[4;17H[?25h[?25l[44;53H^[[4;17H[44;53H  [4;17H[44;53H^[[4;17H[44;53H  [4;17H[?25h[?25l[44;53H:[4;17H[44;1H[K[44;1H:[?25hq![?25l[?2004l[>4;m[23;2t[23;1t[44;1H[K[44;1H[?1004l[?2004l[?1l>[?25h[>4;m[?1049l]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# vi kubia-rc.yaml [8@eplicaset[C[C[C[C[C[Ckubectl label pods kubia-vj app=vj --overrwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C-bskbm app=vj --overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj --over[6Pwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[15Pvi kubia-replicaset.yaml 
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
+[?1049h[>4;2m[?1h=[?2004h[?1004h[1;44r[?12h[?12l[22;2t[22;1t[27m[23m[29m[m[H[2J[?25l[44;1H"kubia-replicaset.yaml" 17L, 264B[2;1H▽[6n[2;1H  [3;1HPzz\[0%m[6n[3;1H           [1;1H[>c]10;?]11;?[1;1H[36mapiVersion[m[35m:[m apps/v1
+[36mkind[m[35m:[m ReplicaSet[2;17H[K[3;1H[36mmetadata[m[35m:[m[3;10H[K[4;3H[36mname[m[35m:[m kubia-vj
+[36mspec[m[35m:[m
+  [36mreplicas[m[35m:[m [31m3[m
+  [36mselector[m[35m:[m
+    [36mmatchLabels[m[35m:[m[9;7H[36mapp[m[35m:[m kubia
+  [36mtemplate[m[35m:[m
+    [36mmetadata[m[35m:[m[12;7H[36mlabels[m[35m:[m[13;9H[36mapp[m[35m:[m kubia
+    [36mspec[m[35m:[m[15;7H[36mcontainers[m[35m:[m[16;7H[33m- [m[36mname[m[35m:[m kubia[17;9H[36mimage[m[35m:[m luksa/kubia
+[1m[34m~                                                                               [19;1H~                                                                               [20;1H~                                                                               [21;1H~                                                                               [22;1H~                                                                               [23;1H~                                                                               [24;1H~                                                                               [25;1H~                                                                               [26;1H~                                                                               [27;1H~                                                                               [28;1H~                                                                               [29;1H~                                                                               [30;1H~                                                                               [31;1H~                                                                               [32;1H~                                                                               [33;1H~                                                                               [34;1H~                                                                               [35;1H~                                                                               [36;1H~                                                                               [37;1H~                                                                               [38;1H~                                                                               [39;1H~                                                                               [40;1H~                                                                               [41;1H~                                                                               [42;1H~                                                                               [43;1H~                                                                               [m[44;63H1,19[10CAll[1;19H[?25h[?25l[44;53H:[1;19H[44;1H[K[44;1H:[?25hq![?25l[?2004l[>4;m[23;2t[23;1t[44;1H[K[44;1H[?1004l[?2004l[?1l>[?25h[>4;m[?1049l]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# vi kubia-replicaset.yaml [8Pc[C[C[C[C[C[C[8@eplicaset[C[C[C[C[C[Ckubectl label pods kubia-vj app=vj --overrwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C-bskbm app=vj --overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj --over[6Pwrite
+Error from server (NotFound): pods "kubia-vj" not found
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# pwd
+/root/kubernetes-training/04-controllers
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# pwdkubectl label pods kubia-vj app=vj --overrwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[15Pvi kubia-replicaset.yaml 
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[8Pc[C[C[C[C[C[C[8@eplicaset[C[C[C[C[C[Ckubectl label pods kubia-vj app=vj --overrwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C-bskbm app=vj --overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C app=vj --over[6Pwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[15Pvi kubia-replicaset.yaml 
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ckubectl label pods kubia2-vj app=vj --oveerwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cget pods[K
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cdelete pod kubia-vj-bskbm[8Pvi kubia-replicaset.yaml [9Pkubectl get pods
+NAME              READY   STATUS    RESTARTS   AGE
+kubia-vj-k4rsk    1/1     Running   0          10m
+kubia-vj-rhcq2    1/1     Running   0          10m
+kubia-vj-t2clw    1/1     Running   0          9m21s
+kubia2-vj-j2g25   1/1     Running   0          14m
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl get pods
+NAME              READY   STATUS    RESTARTS   AGE
+kubia-vj-k4rsk    1/1     Running   0          10m
+kubia-vj-rhcq2    1/1     Running   0          10m
+kubia-vj-t2clw    1/1     Running   0          9m38s
+kubia2-vj-j2g25   1/1     Running   0          15m
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl get podspwd[Kkubectl label pods kubia-vj app=vj --overrwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C- app=vj --overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ck app=vj --overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C4 app=vj --overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cr app=vj --overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cs app=vj --overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ck app=vj [C-overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
+
+pod/kubia-vj-k4rsk labeled
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl label pods kubia-vj-k4rsk app=vj  --overwrite[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cget pods[K
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C -o wide[K[root@ip-172-31-31-150 04-controllers]# kubectl get pods -o wide
+NAME              READY   STATUS    RESTARTS   AGE   IP              NODE                                               NOMINATED NODE   READINESS GATES
+kubia-vj-k4rsk    1/1     Running   0          11m   192.168.1.101   ip-172-31-31-150.ap-southeast-1.compute.internal   <none>           <none>
+kubia-vj-pt2lf    1/1     Running   0          14s   192.168.1.95    ip-172-31-31-150.ap-southeast-1.compute.internal   <none>           <none>
+kubia-vj-rhcq2    1/1     Running   0          11m   192.168.1.103   ip-172-31-31-150.ap-southeast-1.compute.internal   <none>           <none>
+kubia-vj-t2clw    1/1     Running   0          10m   192.168.1.104   ip-172-31-31-150.ap-southeast-1.compute.internal   <none>           <none>
+kubia2-vj-j2g25   1/1     Running   0          15m   192.168.1.93    ip-172-31-31-150.ap-southeast-1.compute.internal   <none>           <none>
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# [K[root@ip-172-31-31-150 04-controllers]# [K[root@ip-172-31-31-150 04-controllers]# kubectl get pods -o wide --show labels
+Error: unknown flag: --show
+See 'kubectl get --help' for usage.
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl get pods -o wide --show labels-labels
+Error: unknown flag: --show
+See 'kubectl get --help' for usage.
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl get pods -o wide --show -labels[K
+Error: unknown flag: --show
+See 'kubectl get --help' for usage.
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# [K[root@ip-172-31-31-150 04-controllers]# [K[root@ip-172-31-31-150 04-controllers]# kubectl get pods -o wide --show -label[1P-label[C[C[C[C[C[Cs
+NAME              READY   STATUS    RESTARTS   AGE   IP              NODE                                               NOMINATED NODE   READINESS GATES   LABELS
+kubia-vj-k4rsk    1/1     Running   0          12m   192.168.1.101   ip-172-31-31-150.ap-southeast-1.compute.internal   <none>           <none>            app=vj
+kubia-vj-pt2lf    1/1     Running   0          70s   192.168.1.95    ip-172-31-31-150.ap-southeast-1.compute.internal   <none>           <none>            app=kubia
+kubia-vj-rhcq2    1/1     Running   0          12m   192.168.1.103   ip-172-31-31-150.ap-southeast-1.compute.internal   <none>           <none>            app=kubia
+kubia-vj-t2clw    1/1     Running   0          11m   192.168.1.104   ip-172-31-31-150.ap-southeast-1.compute.internal   <none>           <none>            app=kubia
+kubia2-vj-j2g25   1/1     Running   0          16m   192.168.1.93    ip-172-31-31-150.ap-southeast-1.compute.internal   <none>           <none>            app=kubia
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl get pods -o wide --show-labels[1P --show-labels[1P --show-labels[1P --show-labels[1P --show-labels[1P--show-labels[1P --show-labels[1P --show-labels[1P--show-labels
+NAME              READY   STATUS    RESTARTS   AGE   LABELS
+kubia-vj-k4rsk    1/1     Running   0          12m   app=vj
+kubia-vj-pt2lf    1/1     Running   0          83s   app=kubia
+kubia-vj-rhcq2    1/1     Running   0          12m   app=kubia
+kubia-vj-t2clw    1/1     Running   0          11m   app=kubia
+kubia2-vj-j2g25   1/1     Running   0          16m   app=kubia
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# curl 192.168.1.101 [K:8080
+You've hit kubia-vj-k4rsk
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# curl 192.168.1.101:8080[1P:80803:8080
+You've hit kubia-vj-rhcq2
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# curl 192.168.1.103:8080[1P3:8080[1P3:808093:8080
+You've hit kubia2-vj-j2g25
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# curl 192.168.1.93:8080103:80801:8080kubectl get pods --show-labelso wide --show-labels -labels[1Plabels[Klabel pods kubia-vj-k4rsk app=vj --overwriteget pods[Kpwd[Kkubectl label pods kubia-vj app=vj --overwrite[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[21Pvi kubia-replicaset.yaml [8Pc[C[C[C[C[C[C[8@eplicaset[C[C[C[C[C[Ckubectl label pods kubia-vj app=vj --overwrite[6@-bskbm[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[6P[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[21Pvi kubia-replicaset.yaml kubectl label pods kubia2-vj app=vj --overwriteget pods[Kdelete pod kubia-vj-bskbm[8Pvi kubia-replicaset.yaml [9Pkubectl get podsapply -f kubia-replicaset.yaml [14Pvi[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[9Pkubectl get podsscale rc kubia2-vj --replicas=1get pods[Kscale rc kubia2-vj --replicas=1[K5
+replicationcontroller/kubia2-vj scaled
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl scale rc kubia2-vj --replicas=5[17Pcurl 192.168.1.93:8080103:80801:8080kubectl get pods --show-labelso wide --show-labels[8P-show-labels
+NAME              READY   STATUS              RESTARTS   AGE     LABELS
+kubia-vj-k4rsk    1/1     Running             0          14m     app=vj
+kubia-vj-pt2lf    1/1     Running             0          3m34s   app=kubia
+kubia-vj-rhcq2    1/1     Running             0          14m     app=kubia
+kubia-vj-t2clw    1/1     Running             0          13m     app=kubia
+kubia2-vj-6j4pr   0/1     ContainerCreating   0          8s      app=kubia
+kubia2-vj-j2g25   1/1     Running             0          18m     app=kubia
+kubia2-vj-jlwqr   0/1     ContainerCreating   0          8s      app=kubia
+kubia2-vj-l8nlf   1/1     Running             0          8s      app=kubia
+kubia2-vj-nmlhz   1/1     Running             0          8s      app=kubia
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl get pods --show-labelsscale rc kubia2-vj --replicas=5[17Pcurl 192.168.1.93:8080103:80801:8080kubectl get pods --show-labelso wide --show-labels -labels[1Plabels[Klabel pods kubia-vj-k4rsk app=vj --overwriteget pods[Kpwd[Kkubectl label pods kubia-vj app=vj --overwrite[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[21Pvi kubia-replicaset.yaml [8Pc[C[C[C[C[C[C[8@eplicaset[C[C[C[C[C[C
+[?1049h[>4;2m[?1h=[?2004h[?1004h[1;44r[?12h[?12l[22;2t[22;1t[27m[23m[29m[m[H[2J[?25l[44;1H"kubia-replicaset.yaml" 17L, 264B[2;1H▽[6n[2;1H  [3;1HPzz\[0%m[6n[3;1H           [1;1H[>c]10;?]11;?[1;1H[36mapiVersion[m[35m:[m apps/v1
+[36mkind[m[35m:[m ReplicaSet[2;17H[K[3;1H[36mmetadata[m[35m:[m[3;10H[K[4;3H[36mname[m[35m:[m kubia-vj
+[36mspec[m[35m:[m
+  [36mreplicas[m[35m:[m [31m3[m
+  [36mselector[m[35m:[m
+    [36mmatchLabels[m[35m:[m[9;7H[36mapp[m[35m:[m kubia
+  [36mtemplate[m[35m:[m
+    [36mmetadata[m[35m:[m[12;7H[36mlabels[m[35m:[m[13;9H[36mapp[m[35m:[m kubia
+    [36mspec[m[35m:[m[15;7H[36mcontainers[m[35m:[m[16;7H[33m- [m[36mname[m[35m:[m kubia[17;9H[36mimage[m[35m:[m luksa/kubia
+[1m[34m~                                                                                                                                                            [19;1H~                                                                                                                                                            [20;1H~                                                                                                                                                            [21;1H~                                                                                                                                                            [22;1H~                                                                                                                                                            [23;1H~                                                                                                                                                            [24;1H~                                                                                                                                                            [25;1H~                                                                                                                                                            [26;1H~                                                                                                                                                            [27;1H~                                                                                                                                                            [28;1H~                                                                                                                                                            [29;1H~                                                                                                                                                            [30;1H~                                                                                                                                                            [31;1H~                                                                                                                                                            [32;1H~                                                                                                                                                            [33;1H~                                                                                                                                                            [34;1H~                                                                                                                                                            [35;1H~                                                                                                                                                            [36;1H~                                                                                                                                                            [37;1H~                                                                                                                                                            [38;1H~                                                                                                                                                            [39;1H~                                                                                                                                                            [40;1H~                                                                                                                                                            [41;1H~                                                                                                                                                            [42;1H~                                                                                                                                                            [43;1H~                                                                                                                                                            [m[44;140H1,19[10CAll[1;19H[?25h[?25l[44;130H~@k[1;19H[44;130H   [2;16H[44;140H2,16[2;16H[?25h[?25l[44;130H~@k[2;16H[44;130H   [3;9H[44;140H3,9 [3;9H[?25h[?25l[44;130H~@k[3;9H[44;130H   [4;16H[44;140H4,16[4;16H[?25h[?25l[44;130H~@k[4;16H[44;130H   [5;5H[44;140H5,5 [5;5H[?25h[?25l[44;130H~@k[5;5H[44;130H   [6;13H[44;140H6,13[6;13H[?25h[?25l[44;130H~@k[6;13H[44;130H   [7;11H[44;140H7,11[7;11H[?25h[?25l[44;130H~@k[7;11H[44;130H   [8;16H[44;140H8,16[8;16H[?25h[?25l[44;130H~@k[8;16H[44;130H   [9;16H[44;140H9[9;16H[?25h[?25l[44;130Hi[9;16H[44;130H [9;16H[44;1H[1m-- INSERT --[m[44;13H[K[44;140H9,16[10CAll[9;16H[?25h[?25l[44;143H7[9;17H[?25h[?25l[10;43r[10;1H[L[1;44r[44;140H[K[44;140H10,9[10CAll[10;9H[?25h[?25ln[44;143H10[10;10H[?25h[?25li[44;144H1[10;11H[?25h[?25l[10;10H[K[44;144H0[10;10H[?25h[?25l[10;9H[K[44;143H9 [10;9H[?25h[?25l[44;143H7[10;7H[?25h[?25ln[44;143H8[10;8H[?25h[?25li[44;143H9[10;9H[?25h[?25lc[44;143H10[10;10H[?25h[?25lk[44;144H1[10;11H[?25h[?25ln[44;144H2[10;12H[?25h[?25la[44;144H3[10;13H[?25h[?25lm[44;144H4[10;14H[?25h[?25le[44;144H5[10;15H[?25h[?25l[10;7H[36mnickname[m[35m:[m[44;144H6[10;16H[?25h[?25l[44;144H7[10;17H[?25h[?25ls[44;144H8[10;18H[?25h[?25lu[44;144H9[10;19H[?25h[?25lp[44;143H20[10;20H[?25h[?25le[44;144H1[10;21H[?25h[?25lr[44;144H2[10;22H[?25h[?25ls[44;144H3[10;23H[?25h[?25lt[44;144H4[10;24H[?25h[?25la[44;144H5[10;25H[?25h[?25lr[44;144H6[10;26H[?25h[44;1H[K[10;25H[?25l[44;130H^[[10;25H[44;130H  [10;26H[44;140H10,25[9CAll[10;25H[?25h[?25l[44;130H:[10;25H[44;130H[K[44;1H:[?25hwq![?25l[?2004l[>4;m"kubia-replicaset.yaml" 18L, 290B written[23;2t[23;1t
+[?1004l[?2004l[?1l>[?25h[>4;m[?1049l]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# vi kubia-replicaset.yaml [1P[1P[1P[1P[1P[1P[1P[1P[1P[1@c
+[?1049h[>4;2m[?1h=[?2004h[?1004h[1;44r[?12h[?12l[22;2t[22;1t[27m[23m[29m[m[H[2J[?25l[44;1H"kubia-rc.yaml" 18L, 299B[2;1H▽[6n[2;1H  [3;1HPzz\[0%m[6n[3;1H           [1;1H[>c]10;?]11;?[1;1H[36mapiVersion[m[35m:[m v1
+[36mkind[m[35m:[m ReplicationController[2;28H[K[3;1H[36mmetadata[m[35m:[m[3;10H[K[4;3H[36mname[m[35m:[m kubia2-vj
+[36mspec[m[35m:[m
+  [36mreplicas[m[35m:[m [31m3[m
+  [36mselector[m[35m:[m[8;7H[36mapp[m[35m:[m kubia
+  [36mtemplate[m[35m:[m
+    [36mmetadata[m[35m:[m[11;7H[36mlabels[m[35m:[m[12;9H[36mapp[m[35m:[m kubia
+    [36mspec[m[35m:[m[14;7H[36mcontainers[m[35m:[m[15;7H[33m- [m[36mname[m[35m:[m kubia[16;9H[36mimage[m[35m:[m luksa/kubia[17;9H[36mports[m[35m:[m[18;9H[33m- [m[36mcontainerPort[m[35m:[m [31m8080[m
+[1m[34m~                                                                                                                                                            [20;1H~                                                                                                                                                            [21;1H~                                                                                                                                                            [22;1H~                                                                                                                                                            [23;1H~                                                                                                                                                            [24;1H~                                                                                                                                                            [25;1H~                                                                                                                                                            [26;1H~                                                                                                                                                            [27;1H~                                                                                                                                                            [28;1H~                                                                                                                                                            [29;1H~                                                                                                                                                            [30;1H~                                                                                                                                                            [31;1H~                                                                                                                                                            [32;1H~                                                                                                                                                            [33;1H~                                                                                                                                                            [34;1H~                                                                                                                                                            [35;1H~                                                                                                                                                            [36;1H~                                                                                                                                                            [37;1H~                                                                                                                                                            [38;1H~                                                                                                                                                            [39;1H~                                                                                                                                                            [40;1H~                                                                                                                                                            [41;1H~                                                                                                                                                            [42;1H~                                                                                                                                                            [43;1H~                                                                                                                                                            [m[44;140H4,17[10CAll[4;17H[?25h[?25l[44;130Hi[4;17H[44;130H [4;17H[44;1H[1m-- INSERT --[m[44;13H[K[44;140H4,17[10CAll[4;17H[?25h[?25l[44;140H5,6 [5;6H[?25h[?25l[44;140H6,14[6;14H[?25h[?25l[44;140H7,12[7;12H[?25h[?25l[44;140H8,17[8;17H[?25h[?25l[9;43r[9;1H[L[1;44r[44;140H[K[44;140H9,9[11CAll[9;9H[?25h[?25l[44;142H7[9;7H[?25h[?25ln[44;142H8[9;8H[?25h[?25li[44;142H9[9;9H[?25h[?25lc[44;142H10[9;10H[?25h[?25lk[44;143H1[9;11H[?25h[?25ln[44;143H2[9;12H[?25h[?25la[44;143H3[9;13H[?25h[?25lm[44;143H4[9;14H[?25h[?25le[44;143H5[9;15H[?25h[?25l[9;7H[36mnickname[m[35m:[m[44;143H6[9;16H[?25h[?25l[44;143H7[9;17H[?25h[?25lm[44;143H8[9;18H[?25h[?25le[44;143H9[9;19H[?25h[?25lg[44;142H20[9;20H[?25h[?25la[44;143H1[9;21H[?25h[?25ls[44;143H2[9;22H[?25h[?25lt[44;143H3[9;23H[?25h[?25la[44;143H4[9;24H[?25h[?25lr[44;143H5[9;25H[?25h[44;1H[K[9;24H[?25l[44;130H^[[9;24H[44;130H  [9;25H[44;140H9,24[10CAll[9;24H[?25h[?25l[44;130H:[9;24H[44;130H[K[44;1H:[?25hwq![?25l[?2004l[>4;m"kubia-rc.yaml" 19L, 324B written[23;2t[23;1t
+[?1004l[?2004l[?1l>[?25h[>4;m[?1049l]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# vi kubia-rc.yaml [8@eplicaset[C[C[C[C[C[Ckubectl get pods --show-labels
+NAME              READY   STATUS    RESTARTS   AGE     LABELS
+kubia-vj-k4rsk    1/1     Running   0          16m     app=vj
+kubia-vj-pt2lf    1/1     Running   0          5m42s   app=kubia
+kubia-vj-rhcq2    1/1     Running   0          16m     app=kubia
+kubia-vj-t2clw    1/1     Running   0          15m     app=kubia
+kubia2-vj-6j4pr   1/1     Running   0          2m16s   app=kubia
+kubia2-vj-j2g25   1/1     Running   0          21m     app=kubia
+kubia2-vj-jlwqr   1/1     Running   0          2m16s   app=kubia
+kubia2-vj-l8nlf   1/1     Running   0          2m16s   app=kubia
+kubia2-vj-nmlhz   1/1     Running   0          2m16s   app=kubia
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl get pods --show-labels[13Pvi kubia-rc.yaml [8@eplicaset[C[C[C[C[C[Ckubectl get pods --show-labelsscale rc kubia2-vj --replicas=5[17Pcurl 192.168.1.93:8080103:80801:8080kubectl get pods --show-labelso wide --show-labels -labels[1Plabels[Klabel pods kubia-vj-k4rsk app=vj --overwriteget pods[Kpwd[Kkubectl label pods kubia-vj app=vj --overwrite[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[21Pvi kubia-replicaset.yaml [8Pc[C[C[C[C[C[C[8@eplicaset[C[C[C[C[C[Ckubectl label pods kubia-vj app=vj --overwrite[6@-bskbm[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[6P[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[21Pvi kubia-replicaset.yaml kubectl label pods kubia2-vj app=vj --overwriteget pods[Kdelete pod kubia-vj-bskbm[8Pvi kubia-replicaset.yaml [9Pkubectl get podsapply -f kubia-replicaset.yaml 
+The ReplicaSet "kubia-vj" is invalid: 
+* spec.template.metadata.labels: Invalid value: map[string]string{"app":"kubia"}: `selector` does not match template `labels`
+* spec.selector: Invalid value: v1.LabelSelector{MatchLabels:map[string]string{"app":"kubia", "nickname":"superstar"}, MatchExpressions:[]v1.LabelSelectorRequirement(nil)}: field is immutable
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl apply -f kubia-replicaset.yaml [9Pget pods --show-labels[13Pvi kubia-rc.yaml [8@eplicaset[C[C[C[C[C[C
+[?1049h[>4;2m[?1h=[?2004h[?1004h[1;44r[?12h[?12l[22;2t[22;1t[27m[23m[29m[m[H[2J[?25l[44;1H"kubia-replicaset.yaml" 18L, 290B[2;1H▽[6n[2;1H  [3;1HPzz\[0%m[6n[3;1H           [1;1H[>c]10;?]11;?[1;1H[36mapiVersion[m[35m:[m apps/v1
+[36mkind[m[35m:[m ReplicaSet[2;17H[K[3;1H[36mmetadata[m[35m:[m[3;10H[K[4;3H[36mname[m[35m:[m kubia-vj
+[36mspec[m[35m:[m
+  [36mreplicas[m[35m:[m [31m3[m
+  [36mselector[m[35m:[m
+    [36mmatchLabels[m[35m:[m[9;7H[36mapp[m[35m:[m kubia[10;7H[36mnickname[m[35m:[m superstar
+  [36mtemplate[m[35m:[m
+    [36mmetadata[m[35m:[m[13;7H[36mlabels[m[35m:[m[14;9H[36mapp[m[35m:[m kubia
+    [36mspec[m[35m:[m[16;7H[36mcontainers[m[35m:[m[17;7H[33m- [m[36mname[m[35m:[m kubia[18;9H[36mimage[m[35m:[m luksa/kubia
+[1m[34m~                                                                                                                                                            [20;1H~                                                                                                                                                            [21;1H~                                                                                                                                                            [22;1H~                                                                                                                                                            [23;1H~                                                                                                                                                            [24;1H~                                                                                                                                                            [25;1H~                                                                                                                                                            [26;1H~                                                                                                                                                            [27;1H~                                                                                                                                                            [28;1H~                                                                                                                                                            [29;1H~                                                                                                                                                            [30;1H~                                                                                                                                                            [31;1H~                                                                                                                                                            [32;1H~                                                                                                                                                            [33;1H~                                                                                                                                                            [34;1H~                                                                                                                                                            [35;1H~                                                                                                                                                            [36;1H~                                                                                                                                                            [37;1H~                                                                                                                                                            [38;1H~                                                                                                                                                            [39;1H~                                                                                                                                                            [40;1H~                                                                                                                                                            [41;1H~                                                                                                                                                            [42;1H~                                                                                                                                                            [43;1H~                                                                                                                                                            [m[44;140H10,25[9CAll[10;25H[?25h[?25l[44;130Hi[10;25H[44;130H [10;25H[44;1H[1m-- INSERT --[m[44;13H[K[44;140H10,25[9CAll[10;25H[?25h[?25ldr[44;144H6[10;26H[?25h[?25ldr[44;144H7[10;27H[?25h[44;1H[K[10;26H[?25l[44;130H^[[10;26H[44;130H  [10;27H[44;140H10,26[9CAll[10;26H[?25h[?25l[44;130Hd[10;26H[?25h[?25l[44;131Hd[10;26H[44;130H  [10;3H[10;43r[43;1H
+[1;44r[43;1H[1m[34m~                                                                                                                                                            [m[44;140H[K[44;140H10,3[10CAll[10;3H[?25h[?25l[44;130H~@k[10;3H[44;130H   [11;3H[44;141H1[11;3H[?25h[?25l[44;130H~@k[11;3H[44;130H   [12;3H[44;141H2[12;3H[?25h[?25l[44;130H~@k[12;3H[44;130H   [12;4H[44;143H4[12;4H[?25h[?25l[44;130H~@k[12;4H[44;130H   [12;5H[44;143H5[12;5H[?25h[?25l[44;130H~@k[12;5H[44;130H   [12;6H[44;143H6[12;6H[?25h[?25l[44;130H~@k[12;6H[44;130H   [12;7H[44;143H7[12;7H[?25h[?25l[44;130H~@k[12;7H[44;130H   [12;8H[44;143H8[12;8H[?25h[?25l[44;130H~@k[12;8H[44;130H   [12;9H[44;143H9[12;9H[?25h[?25l[44;130H~@k[12;9H[44;130H   [12;10H[44;143H10[12;10H[?25h[?25l[44;130H~@k[12;10H[44;130H   [11;10H[44;141H1[11;10H[?25h[?25l[44;130H~@k[11;10H[44;130H   [12;10H[44;141H2[12;10H[?25h[?25l[44;130H~@k[12;10H[44;130H   [13;10H[44;141H3[13;10H[?25h[?25l[44;130H~@k[13;10H[44;130H   [13;11H[44;144H1[13;11H[?25h[?25l[44;130H~@k[13;11H[44;130H   [13;12H[44;144H2[13;12H[?25h[?25l[44;130H~@k[13;12H[44;130H   [13;13H[44;144H3[13;13H[?25h[?25l[44;130H~@k[13;13H[44;130H   [13;14H[44;144H4[13;14H[?25h[?25l[44;130H~@k[13;14H[44;130H   [13;15H[44;144H5[13;15H[?25h[?25l[44;130H~@k[13;15H[44;130H   [13;16H[44;144H6[13;16H[?25h[?25l[44;130H~@k[13;16H[44;130H   [13;17H[44;144H7[13;17H[?25h[?25l[44;130H~@k[13;17H[44;130H   [13;18H[44;144H8[13;18H[?25h[?25l[44;130H~@k[13;18H[44;130H   [13;18H[?25h[?25l[44;130H~@k[13;18H[44;130H   [13;18H[?25h[?25l[44;130Hi[13;18H[44;130H [13;18H[44;1H[1m-- INSERT --[m[44;140H[K[44;140H13,18[9CAll[13;18H[?25h[?25l[44;144H9[13;19H[?25h[?25l[14;43r[14;1H[L[1;44r[44;140H[K[44;140H14,11[9CAll[14;11H[?25h[?25l[44;143H9 [14;9H[?25h[?25l[44;143H7[14;7H[?25h[?25l[44;143H8[14;8H[?25h[?25l[44;143H9[14;9H[?25h[?25ln[44;143H10[14;10H[?25h[?25li[44;144H1[14;11H[?25h[?25lc[44;144H2[14;12H[?25h[?25lk[44;144H3[14;13H[?25h[?25ln[44;144H4[14;14H[?25h[?25la[44;144H5[14;15H[?25h[?25lm[44;144H6[14;16H[?25h[?25le[44;144H7[14;17H[?25h[?25l[14;9H[36mnickname[m[35m:[m[44;144H8[14;18H[?25h[?25l[14;9Hnickname:s[44;144H9[14;19H[?25h[?25lu[44;143H20[14;20H[?25h[?25lp[44;144H1[14;21H[?25h[?25le[44;144H2[14;22H[?25h[?25lr[44;144H3[14;23H[?25h[?25ls[44;144H4[14;24H[?25h[?25lt[44;144H5[14;25H[?25h[?25la[44;144H6[14;26H[?25h[?25lr[44;144H7[14;27H[?25h[44;1H[K[14;26H[?25l[44;130H^[[14;26H[44;130H  [14;27H[44;140H14,26[9CAll[14;26H[?25h[?25l[44;130H:[14;26H[44;130H[K[44;1H:[?25hwq![?25l[?2004l[>4;m"kubia-replicaset.yaml" 18L, 291B written[23;2t[23;1t
+[?1004l[?2004l[?1l>[?25h[>4;m[?1049l]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# vi kubia-replicaset.yaml [14@kubectl apply -f[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
+error: error parsing kubia-replicaset.yaml: error converting YAML to JSON: yaml: line 15: could not find expected ':'
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# 'kubectl apply -f kubia-replicaset.yaml [14Pvi[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
+[?1049h[>4;2m[?1h=[?2004h[?1004h[1;44r[?12h[?12l[22;2t[22;1t[27m[23m[29m[m[H[2J[?25l[44;1H"kubia-replicaset.yaml" 18L, 291B[2;1H▽[6n[2;1H  [3;1HPzz\[0%m[6n[3;1H           [1;1H[>c]10;?]11;?[1;1H[36mapiVersion[m[35m:[m apps/v1
+[36mkind[m[35m:[m ReplicaSet[2;17H[K[3;1H[36mmetadata[m[35m:[m[3;10H[K[4;3H[36mname[m[35m:[m kubia-vj
+[36mspec[m[35m:[m
+  [36mreplicas[m[35m:[m [31m3[m
+  [36mselector[m[35m:[m
+    [36mmatchLabels[m[35m:[m[9;7H[36mapp[m[35m:[m kubia
+  [36mtemplate[m[35m:[m
+    [36mmetadata[m[35m:[m[12;7H[36mlabels[m[35m:[m[13;9H[36mapp[m[35m:[m kubia[14;9Hnickname:superstar
+    [36mspec[m[35m:[m[16;7H[36mcontainers[m[35m:[m[17;7H[33m- [m[36mname[m[35m:[m kubia[18;9H[36mimage[m[35m:[m luksa/kubia
+[1m[34m~                                                                                                                                                            [20;1H~                                                                                                                                                            [21;1H~                                                                                                                                                            [22;1H~                                                                                                                                                            [23;1H~                                                                                                                                                            [24;1H~                                                                                                                                                            [25;1H~                                                                                                                                                            [26;1H~                                                                                                                                                            [27;1H~                                                                                                                                                            [28;1H~                                                                                                                                                            [29;1H~                                                                                                                                                            [30;1H~                                                                                                                                                            [31;1H~                                                                                                                                                            [32;1H~                                                                                                                                                            [33;1H~                                                                                                                                                            [34;1H~                                                                                                                                                            [35;1H~                                                                                                                                                            [36;1H~                                                                                                                                                            [37;1H~                                                                                                                                                            [38;1H~                                                                                                                                                            [39;1H~                                                                                                                                                            [40;1H~                                                                                                                                                            [41;1H~                                                                                                                                                            [42;1H~                                                                                                                                                            [43;1H~                                                                                                                                                            [m[44;140H14,26[9CAll[14;26H[?25h[?25l[44;130H~@k[14;26H[44;130H   [14;25H[44;144H5[14;25H[?25h[?25l[44;130H~@k[14;25H[44;130H   [14;24H[44;144H4[14;24H[?25h[?25l[44;130H~@k[14;24H[44;130H   [14;23H[44;144H3[14;23H[?25h[?25l[44;130H~@k[14;23H[44;130H   [14;22H[44;144H2[14;22H[?25h[?25l[44;130H~@k[14;22H[44;130H   [14;21H[44;144H1[14;21H[?25h[?25l[44;130H~@k[14;21H[44;130H   [14;20H[44;144H0[14;20H[?25h[?25l[44;130H~@k[14;20H[44;130H   [14;19H[44;143H19[14;19H[?25h[?25l[44;130H~@k[14;19H[44;130H   [14;18H[44;144H8[14;18H[?25h[?25l[44;130H^[[14;18H[44;130H  [14;18H[44;130H^[[14;18H[44;130H  [14;18H[?25h[?25l[44;130Hi[14;18H[44;130H [14;18H[44;1H[1m-- INSERT --[m[44;13H[K[44;140H14,18[9CAll[14;18H[?25h[?25l[14;9H[36mnickname[m[35m:[m superstar[44;144H9[14;19H[?25h[44;1H[K[14;18H[?25l[44;130H^[[14;18H[44;130H  [14;19H[44;140H14,18[9CAll[14;18H[?25h[?25l[44;130H:[14;18H[44;130H[K[44;1H:[?25hwq![?25l[?2004l[>4;m"kubia-replicaset.yaml" 18L, 292B written[23;2t[23;1t
+[?1004l[?2004l[?1l>[?25h[>4;m[?1049l]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# vi kubia-replicaset.yaml [14@kubectl apply -f[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
+replicaset.apps/kubia-vj configured
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl apply -f kubia-replicaset.yaml [14Pvi[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[1P[1P[1P[1P[1P[1P[1P[1P[1P[1@c
+[?1049h[>4;2m[?1h=[?2004h[?1004h[1;44r[?12h[?12l[22;2t[22;1t[27m[23m[29m[m[H[2J[?25l[44;1H"kubia-rc.yaml" 19L, 324B[2;1H▽[6n[2;1H  [3;1HPzz\[0%m[6n[3;1H           [1;1H[>c]10;?]11;?[1;1H[36mapiVersion[m[35m:[m v1
+[36mkind[m[35m:[m ReplicationController[2;28H[K[3;1H[36mmetadata[m[35m:[m[3;10H[K[4;3H[36mname[m[35m:[m kubia2-vj
+[36mspec[m[35m:[m
+  [36mreplicas[m[35m:[m [31m3[m
+  [36mselector[m[35m:[m[8;7H[36mapp[m[35m:[m kubia[9;7H[36mnickname[m[35m:[m megastar
+  [36mtemplate[m[35m:[m
+    [36mmetadata[m[35m:[m[12;7H[36mlabels[m[35m:[m[13;9H[36mapp[m[35m:[m kubia
+    [36mspec[m[35m:[m[15;7H[36mcontainers[m[35m:[m[16;7H[33m- [m[36mname[m[35m:[m kubia[17;9H[36mimage[m[35m:[m luksa/kubia[18;9H[36mports[m[35m:[m[19;9H[33m- [m[36mcontainerPort[m[35m:[m [31m8080[m
+[1m[34m~                                                                                                                                                            [21;1H~                                                                                                                                                            [22;1H~                                                                                                                                                            [23;1H~                                                                                                                                                            [24;1H~                                                                                                                                                            [25;1H~                                                                                                                                                            [26;1H~                                                                                                                                                            [27;1H~                                                                                                                                                            [28;1H~                                                                                                                                                            [29;1H~                                                                                                                                                            [30;1H~                                                                                                                                                            [31;1H~                                                                                                                                                            [32;1H~                                                                                                                                                            [33;1H~                                                                                                                                                            [34;1H~                                                                                                                                                            [35;1H~                                                                                                                                                            [36;1H~                                                                                                                                                            [37;1H~                                                                                                                                                            [38;1H~                                                                                                                                                            [39;1H~                                                                                                                                                            [40;1H~                                                                                                                                                            [41;1H~                                                                                                                                                            [42;1H~                                                                                                                                                            [43;1H~                                                                                                                                                            [m[44;140H9,24[10CAll[9;24H[?25h[?25l[44;130Hd[9;24H[?25h[?25l[44;131Hd[9;24H[44;130H  [9;3H[9;43r[43;1H
+[1;44r[43;1H[1m[34m~                                                                                                                                                            [m[44;1H[K[44;140H9,3[11CAll[9;3H[?25h[?25l[44;130H~@k[9;3H[44;130H   [10;3H[44;140H10,3[10;3H[?25h[?25l[44;130H~@k[10;3H[44;130H   [11;3H[44;141H1[11;3H[?25h[?25l[44;130H~@k[11;3H[44;130H   [12;3H[44;141H2[12;3H[?25h[?25l[44;130H~@K[12;3H[44;130H   [12;18H[44;143H18[12;18H[?25h[?25l[44;130Hi[12;18H[44;130H [12;18H[44;1H[1m-- INSERT --[m[44;140H[K[44;140H12,18[9CAll[12;18H[?25h[?25l[44;144H9[12;19H[?25h[?25l[13;43r[13;1H[L[1;44r[44;140H[K[44;140H13,11[9CAll[13;11H[?25h[?25l[44;143H9 [13;9H[?25h[?25ln[44;143H10[13;10H[?25h[?25li[44;144H1[13;11H[?25h[?25lc[44;144H2[13;12H[?25h[?25lk[44;144H3[13;13H[?25h[?25ln[44;144H4[13;14H[?25h[?25la[44;144H5[13;15H[?25h[?25lm[44;144H6[13;16H[?25h[?25le[44;144H7[13;17H[?25h[?25l[13;9H[36mnickname[m[35m:[m[44;144H8[13;18H[?25h[?25l[44;144H9[13;19H[?25h[?25lm[44;143H20[13;20H[?25h[?25le[44;144H1[13;21H[?25h[?25lg[44;144H2[13;22H[?25h[?25la[44;144H3[13;23H[?25h[?25ls[44;144H4[13;24H[?25h[?25lt[44;144H5[13;25H[?25h[?25la[44;144H6[13;26H[?25h[?25lr[44;144H7[13;27H[?25h[44;1H[K[13;26H[?25l[44;130H^[[13;26H[44;130H  [13;27H[44;140H13,26[9CAll[13;26H[?25h[?25l[44;130H:[13;26H[44;130H[K[44;1H:[?25hwq![?25l[?2004l[>4;m"kubia-rc.yaml" 19L, 326B written[23;2t[23;1t
+[?1004l[?2004l[?1l>[?25h[>4;m[?1049l]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# vi kubia-rc.yaml [22@kubectl apply -f kubia-replicaset[C[C[C[C[C[C[1P[1P[1P[1P[1P[1P[1P[1P[1P[1@c
+replicationcontroller/kubia2-vj configured
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# kubectl apply -f kubia-rc.yaml [14Pvi[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[22@kubectl apply -f kubia-replicaset[C[C[C[C[C[C[14Pvi[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[14@kubectl apply -f[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[14Pvi[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[14@kubectl apply -f[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[9Pget pods --show-labels[13Pvi kubia-rc.yaml kubectl get pods --show-labels
+NAME              READY   STATUS        RESTARTS   AGE     LABELS
+kubia-vj-k4rsk    1/1     Running       0          20m     app=vj
+kubia-vj-pt2lf    1/1     Running       0          9m14s   app=kubia
+kubia-vj-rhcq2    1/1     Running       0          20m     app=kubia
+kubia-vj-t2clw    1/1     Running       0          19m     app=kubia
+kubia2-vj-6j4pr   1/1     Terminating   0          5m48s   app=kubia
+kubia2-vj-j2g25   1/1     Running       0          24m     app=kubia
+kubia2-vj-jlwqr   1/1     Terminating   0          5m48s   app=kubia
+kubia2-vj-l8nlf   1/1     Running       0          5m48s   app=kubia
+kubia2-vj-nmlhz   1/1     Running       0          5m48s   app=kubia
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# watchb date
+-bash: watchb: command not found
+]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# watchb date[1P date
+[?1049h[1;44r(B[m[4l[?7h[H[2JEvery 2.0s: date[1;134HThu Apr 28 18:48:42 2022[3;1HThu Apr 28 18:48:42 UTC 2022[44;157H[1;152H4[3;19H4[44;157H[H[2JEvery 2.0s: date[1;57HThu Apr 28 18:48:45 2022[3;1HThu Apr 28 18:48:45 UTC 2022[24;80H[1;75H7[3;19H7[24;80H[1;75H9[3;19H9[24;80H[1;74H51[3;18H51[24;80H[1;75H3[3;19H3[24;80H[1;75H5[3;19H5[24;80H[1;75H7[3;19H7[24;80H[1;75H9[3;19H9[24;80H[1;72H9:01[3;16H9:01[24;80H[1;75H3[3;19H3[24;80H[1;75H5[3;19H5[24;80H[1;75H7[3;19H7[24;80H[1;75H9[3;19H9[24;80H[1;74H11[3;18H11[24;80H[1;75H3[3;19H3[24;80H[1;75H5[3;19H5[24;80H[1;75H7[3;19H7[24;80H[1;75H9[3;19H9[24;80H[1;74H21[3;18H21[24;80H[1;75H3[3;19H3[24;80H[1;75H5[3;19H5[24;80H[1;75H7[3;19H7[24;80H[1;75H9[3;19H9[24;80H[1;74H31[3;18H31[24;80H[1;75H3[3;19H3[24;80H[1;75H5[3;19H5[24;80H[1;75H7[3;19H7[24;80H[1;75H9[3;19H9[24;80H[1;74H41[3;18H41[24;80H[1;75H3[3;19H3[24;80H[1;75H5[3;19H5[24;80H[1;75H7[3;19H7[24;80H[1;75H9[3;19H9[24;80H[1;74H51[3;18H51[24;80H[1;75H3[3;19H3[24;80H[1;75H5[3;19H5[24;80H[1;75H7[3;19H7[24;80H[1;75H9[3;19H9[24;80H[1;71H50:01[3;15H50:01[24;80H[1;75H3[3;19H3[24;80H[1;75H5[3;19H5[24;80H[1;75H7[3;19H7[24;80H[1;75H9[3;19H9[24;80H[1;74H11[3;18H11[24;80H[1;75H3[3;19H3[24;80H[1;75H5[3;19H5[24;80H[1;75H7[3;19H7[24;80H[1;75H9[3;19H9[24;80H[1;74H21[3;18H21[24;80H[1;75H3[3;19H3[24;80H[1;75H5[3;19H5[24;80H[1;75H7[3;19H7[24;80H[1;75H9[3;19H9[24;80H[1;74H31[3;18H31[24;80H[1;75H3[3;19H3[24;80H[1;75H5[3;19H5[24;80H[1;75H7[3;19H7[24;80H[1;75H9[3;19H9[24;80H[1;74H41[3;18H41[24;80H[1;75H3[3;19H3[24;80H[1;75H5[3;19H5[24;80H[1;75H7[3;19H7[24;80H[24;1H[?1049l[?1l>]0;root@ip-172-31-31-150:~/kubernetes-training/04-controllers[root@ip-172-31-31-150 04-controllers]# cd ..
+]0;root@ip-172-31-31-150:~/kubernetes-training[root@ip-172-31-31-150 kubernetes-training]# cd 05-services/
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# ls
+external-service-endpoints.yaml            kubia-svc-headless.yaml
+external-service-externalname.yaml         kubia-svc-loadbalancer.yaml
+external-service.yaml                      kubia-svc-named-ports.yaml
+[0m[01;34mingress[0m                                    kubia-svc-nodeport-onlylocal.yaml
+kubia-ingress-tls.yaml                     kubia-svc-nodeport.yaml
+kubia-ingress.yaml                         kubia-svc-publish-not-ready.yaml
+kubia-pod.yml                              kubia-svc.yaml
+kubia-rc-readinessprobe.yaml               tls.cert
+kubia-replicaset.yaml                      tls.key
+kubia-svc-client-ip-session-affinity.yaml
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# vi kubia-svc.yaml 
+[?1049h[>4;2m[?1h=[?2004h[?1004h[1;24r[?12h[?12l[22;2t[22;1t[27m[23m[29m[m[H[2J[?25l[24;1H"kubia-svc.yaml" 12L, 156B[2;1H▽[6n[2;1H  [3;1HPzz\[0%m[6n[3;1H           [1;1H[>c]10;?]11;?[1;1H[36mapiVersion[m[35m:[m v1
+[36mkind[m[35m:[m Service[2;14H[K[3;1H[36mmetadata[m[35m:[m[3;10H[K[4;3H[36mname[m[35m:[m kubia2
+[36mspec[m[35m:[m
+  [36mclusterIP[m[35m:[m 10.99.10.99
+  [36mports[m[35m:[m
+  [33m- [m[36mport[m[35m:[m [31m80[m
+    [36mtargetPort[m[35m:[m [31m8080[m
+  [36mselector[m[35m:[m
+    [36mapp[m[35m:[m kubia
+
+[1m[34m~                                                                               [14;1H~                                                                               [15;1H~                                                                               [16;1H~                                                                               [17;1H~                                                                               [18;1H~                                                                               [19;1H~                                                                               [20;1H~                                                                               [21;1H~                                                                               [22;1H~                                                                               [23;1H~                                                                               [m[24;63H1,1[11CAll[1;1H[?25h[?25l[24;53H^[[1;1H[24;53H  [1;1H[24;53H^[[1;1H[24;53H  [1;1H[?25h[?25l[24;53H:[1;1H[24;1H[K[24;1H:[?25hq![?25l[?2004l[>4;m[23;2t[23;1t[24;1H[K[24;1H[?1004l[?2004l[?1l>[?25h[>4;m[?1049l]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# vi kubia-svc.yaml ls[Kcd 05-services/..[Kwatch dateb datekubectl get pods --show-labelsapply -f kubia-rc.yaml [1P[1P[1@s[1@v[1@c
+service/kubia2 created
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# kubectl apply -f kubia-svc.yaml [14Pvi[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cls[Kcd 05-services/..[Kwatch dateb datekubectl get pods --show-labels
+NAME              READY   STATUS    RESTARTS   AGE     LABELS
+kubia-vj-k4rsk    1/1     Running   0          24m     app=vj
+kubia-vj-pt2lf    1/1     Running   0          13m     app=kubia
+kubia-vj-rhcq2    1/1     Running   0          24m     app=kubia
+kubia-vj-t2clw    1/1     Running   0          23m     app=kubia
+kubia2-vj-j2g25   1/1     Running   0          28m     app=kubia
+kubia2-vj-l8nlf   1/1     Running   0          9m49s   app=kubia
+kubia2-vj-nmlhz   1/1     Running   0          9m49s   app=kubia
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# kubectl get pods --show-labels[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[Ksvc
+NAME     TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)   AGE
+kubia2   ClusterIP   10.99.10.99   <none>        80/TCP    21s
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# kubectl get svc[K[K[Kns
+NAME              STATUS   AGE
+default           Active   8d
+kube-node-lease   Active   8d
+kube-public       Active   8d
+kube-system       Active   8d
+ms                Active   7d10h
+sheth             Active   7d10h
+vj                Active   6d14h
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# kubectl get ns[K[Kds
+No resources found in vj namespace.
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# kubectl get dsnssvc[K[K[Krc
+NAME        DESIRED   CURRENT   READY   AGE
+kubia2-vj   3         3         3       29m
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# kubectl get rc[Ks
+NAME       DESIRED   CURRENT   READY   AGE
+kubia-vj   3         3         3       25m
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# kubectl get rs[K[K[K[K[K[K[K[K[K[K[K[K[K[Kkubectl get rcdsnssvc[K[K[Kpods
+NAME              READY   STATUS    RESTARTS   AGE
+kubia-vj-k4rsk    1/1     Running   0          25m
+kubia-vj-pt2lf    1/1     Running   0          14m
+kubia-vj-rhcq2    1/1     Running   0          25m
+kubia-vj-t2clw    1/1     Running   0          24m
+kubia2-vj-j2g25   1/1     Running   0          30m
+kubia2-vj-l8nlf   1/1     Running   0          11m
+kubia2-vj-nmlhz   1/1     Running   0          11m
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# kubectl get pods -l nickname=superstar
+No resources found in vj namespace.
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# kubectl get pods -l nickname=superstar[1P[1P[1P[1P[1P[1@r[1@c[1@ 
+No resources found in vj namespace.
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# kubectl get rc -l nickname=superstar[1P[1@s
+No resources found in vj namespace.
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# pwd
+/root/kubernetes-training/05-services
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# pwd[K[K[Kkubectl create ds
+Error: must specify one of -f and -k
+
+error: unknown command "ds"
+See 'kubectl create -h' for help and examples
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# kubectl create ds vj
+Error: must specify one of -f and -k
+
+error: unknown command "ds vj"
+See 'kubectl create -h' for help and examples
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# kubeadm token create --print-join-command
+W0428 18:56:55.329042   14715 configset.go:202] WARNING: kubeadm cannot validate component configs for API groups [kubelet.config.k8s.io kubeproxy.config.k8s.io]
+kubeadm join 172.31.23.55:6443 --token bt7hdx.mknia434m82ebz0w     --discovery-token-ca-cert-hash sha256:8d5bd42d61006a3ad006606bb05edfbe75ef481b9e8b3f701ffb26e73af32dc6 
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# kubeadm token create --print-join-command[21Pctl create ds vj[K[K[K[K[K[K[K[K[K[Kget ep
+NAME     ENDPOINTS                                                              AGE
+kubia2   192.168.1.103:8080,192.168.1.104:8080,192.168.1.105:8080 + 3 more...   6m14s
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# vi kube-sv[K[K[K[K[K[K[K[K[K[Kpwd
+/root/kubernetes-training/05-services
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# ls
+external-service-endpoints.yaml            kubia-svc-headless.yaml
+external-service-externalname.yaml         kubia-svc-loadbalancer.yaml
+external-service.yaml                      kubia-svc-named-ports.yaml
+[0m[01;34mingress[0m                                    kubia-svc-nodeport-onlylocal.yaml
+kubia-ingress-tls.yaml                     kubia-svc-nodeport.yaml
+kubia-ingress.yaml                         kubia-svc-publish-not-ready.yaml
+kubia-pod.yml                              kubia-svc.yaml
+kubia-rc-readinessprobe.yaml               tls.cert
+kubia-replicaset.yaml                      tls.key
+kubia-svc-client-ip-session-affinity.yaml
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# vi kubia-svc-nodeport.yaml
+[?1049h[>4;2m[?1h=[?2004h[?1004h[1;24r[?12h[?12l[22;2t[22;1t[27m[23m[29m[m[H[2J[?25l[24;1H"kubia-svc-nodeport.yaml" 13L, 176B[2;1H▽[6n[2;1H  [3;1HPzz\[0%m[6n[3;1H           [1;1H[>c]10;?]11;?[1;1H[36mapiVersion[m[35m:[m v1
+[36mkind[m[35m:[m Service[2;14H[K[3;1H[36mmetadata[m[35m:[m[3;10H[K[4;3H[36mname[m[35m:[m kubia-nodeport
+[36mspec[m[35m:[m
+  [36mtype[m[35m:[m NodePort
+  [36mports[m[35m:[m
+  [33m- [m[36mport[m[35m:[m [31m80[m
+    [36mtargetPort[m[35m:[m [31m8080[m
+    [36mnodePort[m[35m:[m [31m30123[m
+  [36mselector[m[35m:[m
+    [36mapp[m[35m:[m kubia
+
+[1m[34m~                                                                               [15;1H~                                                                               [16;1H~                                                                               [17;1H~                                                                               [18;1H~                                                                               [19;1H~                                                                               [20;1H~                                                                               [21;1H~                                                                               [22;1H~                                                                               [23;1H~                                                                               [m[24;63H1,1[11CAll[1;1H[?25h[?25l[24;53H^[[1;1H[24;53H  [1;1H[24;53H^[[1;1H[24;53H  [1;1H[?25h[?25l[24;53H:[1;1H[24;1H[K[24;1H:[?25hq![?25l[?2004l[>4;m[23;2t[23;1t[24;1H[K[24;1H[?1004l[?2004l[?1l>[?25h[>4;m[?1049l]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# vi kubia-svc-nodeport.yamlls[Kpwdkubectl get epadm token create --print-join-command[21Pctl create ds vj[Kpwd[Kkubectl get rs -l nickname=superstarc[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[2@pods[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[K[Kkubectl get rcdsnssvcpods --show-labelsapply -f kubia-svc.yaml [1P[1P[1P[1P[1P[1@i[1P[1@u[1@b[1@i[1@a[1@-[C[C[C[1@-[1@n[1@o[6@deport
+service/kubia-nodeport created
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# kubectl apply -f kubia-svc-nodeport.yaml [C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[15Pvi kubia-svc-nodeport.yamlls[Kpwdkubectl get ep
+NAME             ENDPOINTS                                                              AGE
+kubia-nodeport   192.168.1.103:8080,192.168.1.104:8080,192.168.1.105:8080 + 3 more...   8s
+kubia2           192.168.1.103:8080,192.168.1.104:8080,192.168.1.105:8080 + 3 more...   9m20s
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# kubectl get epapply -f kubia-svc-nodeport.yaml [C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[15Pvi kubia-svc-nodeport.yamlls[Kpwdkubectl get epadm token create --print-join-command[21Pctl create ds vj[Kpwd[Kkubectl get rs -l nickname=superstarc[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[2@pods[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[K[Kkubectl get pods
+NAME              READY   STATUS    RESTARTS   AGE
+kubia-vj-k4rsk    1/1     Running   0          34m
+kubia-vj-pt2lf    1/1     Running   0          22m
+kubia-vj-rhcq2    1/1     Running   0          34m
+kubia-vj-t2clw    1/1     Running   0          32m
+kubia2-vj-j2g25   1/1     Running   0          38m
+kubia2-vj-l8nlf   1/1     Running   0          19m
+kubia2-vj-nmlhz   1/1     Running   0          19m
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# kubectl get pods[K[K[K[Ksvc
+NAME             TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
+kubia-nodeport   NodePort    10.106.48.24   <none>        80:30123/TCP   37s
+kubia2           ClusterIP   10.99.10.99    <none>        80/TCP         9m49s
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# curl 10.99.10.99 [K:80
+You've hit kubia2-vj-j2g25
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# curl 10.99.10.99:80[K[K30123[1P:30123[1P:30123[1P:30123[1P:30123[1P:30123[1P:30123[1P:30123[1P:301231:301230:301236:30123.:301234:301238:30123.:301232:301234:30123
+^C
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# curl 10.106.48.24:30123[K[K[K[K[K80
+You've hit kubia2-vj-j2g25
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# curl 10.106.48.24:8030123[4P99.10.99:80[4Pkubectl get svcpods[K[K[K[Kep
+NAME             ENDPOINTS                                                              AGE
+kubia-nodeport   192.168.1.103:8080,192.168.1.104:8080,192.168.1.105:8080 + 3 more...   2m14s
+kubia2           192.168.1.103:8080,192.168.1.104:8080,192.168.1.105:8080 + 3 more...   11m
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# curl 192.168.1.103:8080,
+curl: (3) URL using bad/illegal format or missing URL
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# curl 192.168.1.103:8080,[K
+You've hit kubia-vj-rhcq2
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# curl 192.168.1.103:8080[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K192.168.1.104:8080,
+curl: (3) URL using bad/illegal format or missing URL
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# curl 192.168.1.104:8080,[K
+You've hit kubia-vj-t2clw
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# 
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# vi kubia-loa[K[K[K[K[K[K[K[K[K[K[K[Kls
+external-service-endpoints.yaml            kubia-svc-headless.yaml
+external-service-externalname.yaml         kubia-svc-loadbalancer.yaml
+external-service.yaml                      kubia-svc-named-ports.yaml
+[0m[01;34mingress[0m                                    kubia-svc-nodeport-onlylocal.yaml
+kubia-ingress-tls.yaml                     kubia-svc-nodeport.yaml
+kubia-ingress.yaml                         kubia-svc-publish-not-ready.yaml
+kubia-pod.yml                              kubia-svc.yaml
+kubia-rc-readinessprobe.yaml               tls.cert
+kubia-replicaset.yaml                      tls.key
+kubia-svc-client-ip-session-affinity.yaml
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# lscurl 192.168.1.104:8080,[1P3:8080,[K4:8080,[Kls[K[Kvi kubia-svc-loadbalancer.yaml
+[?1049h[>4;2m[?1h=[?2004h[?1004h[1;24r[?12h[?12l[22;2t[22;1t[27m[23m[29m[m[H[2J[?25l[24;1H"kubia-svc-loadbalancer.yaml" 12L, 164B[2;1H▽[6n[2;1H  [3;1HPzz\[0%m[6n[3;1H           [1;1H[>c]10;?]11;?[1;1H[36mapiVersion[m[35m:[m v1
+[36mkind[m[35m:[m Service[2;14H[K[3;1H[36mmetadata[m[35m:[m[3;10H[K[4;3H[36mname[m[35m:[m kubia-loadbalancer
+[36mspec[m[35m:[m
+  [36mtype[m[35m:[m LoadBalancer
+  [36mports[m[35m:[m
+  [33m- [m[36mport[m[35m:[m [31m80[m
+    [36mtargetPort[m[35m:[m [31m8080[m
+  [36mselector[m[35m:[m
+    [36mapp[m[35m:[m kubia
+
+[1m[34m~                                                                               [14;1H~                                                                               [15;1H~                                                                               [16;1H~                                                                               [17;1H~                                                                               [18;1H~                                                                               [19;1H~                                                                               [20;1H~                                                                               [21;1H~                                                                               [22;1H~                                                                               [23;1H~                                                                               [m[24;63H1,1[11CAll[1;1H[?25h[?25l[24;53H^[[1;1H[24;53H  [1;1H[24;53H^[[1;1H[24;53H  [1;1H[?25h[?25l[24;53H:[1;1H[24;1H[K[24;1H:[?25hq![?25l[?2004l[>4;m[23;2t[23;1t[24;1H[K[24;1H[?1004l[?2004l[?1l>[?25h[>4;m[?1049l]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# vi kubia-svc-loadbalancer.yamlls[Kcurl 192.168.1.104:8080,[1P3:8080,[10Pkubectl get epcurl 10.106.48.24:8030123[4P99.10.99:80[4Pkubectl get svcpods[2Pepapply -f kubia-svc-nodeport.yaml [1P[1P[1P[1P[1P[1P[1P[1P[1P[1P[1P[1@v[1@c[1@-[1@l[1@oadbalancer.yamll.yaml [C
+error: the path "kubia-svc-loadbalancer.yaml.yaml" does not exist
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# kubectl apply -f kubia-svc-loadbalancer.yamll.yaml [1P [1P [1P [1P [1P 
+service/kubia-loadbalancer created
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# kubectl apply -f kubia-svc-loadbalancer.yamll .yaml [A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[13Pvi kubia-svc-loadbalancer.yaml
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cls[Kcurl 192.168.1.104:8080,[1P3:8080,[10Pkubectl get epcurl 10.106.48.24:8030123[4P99.10.99:80[4Pkubectl get svcpods[2Pep
+NAME                 ENDPOINTS                                                              AGE
+kubia-loadbalancer   192.168.1.103:8080,192.168.1.104:8080,192.168.1.105:8080 + 3 more...   13s
+kubia-nodeport       192.168.1.103:8080,192.168.1.104:8080,192.168.1.105:8080 + 3 more...   6m6s
+kubia2               192.168.1.103:8080,192.168.1.104:8080,192.168.1.105:8080 + 3 more...   15m
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# kubectl get epapply -f kubia-svc-loadbalancer.yamll .yaml [A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[13Pvi kubia-svc-loadbalancer.yaml
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cls[Kcurl 192.168.1.104:8080,[1P3:8080,[10Pkubectl get epcurl 10.106.48.24:8030123[4P99.10.99:80[4Pkubectl get svcpods
+NAME              READY   STATUS    RESTARTS   AGE
+kubia-vj-k4rsk    1/1     Running   0          40m
+kubia-vj-pt2lf    1/1     Running   0          28m
+kubia-vj-rhcq2    1/1     Running   0          40m
+kubia-vj-t2clw    1/1     Running   0          38m
+kubia2-vj-j2g25   1/1     Running   0          44m
+kubia2-vj-l8nlf   1/1     Running   0          25m
+kubia2-vj-nmlhz   1/1     Running   0          25m
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# kubectl get pods[K[K[K[Ksvc
+NAME                 TYPE           CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
+kubia-loadbalancer   LoadBalancer   10.103.36.50   <pending>     80:32486/TCP   43s
+kubia-nodeport       NodePort       10.106.48.24   <none>        80:30123/TCP   6m36s
+kubia2               ClusterIP      10.99.10.99    <none>        80/TCP         15m
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# cd ..
+]0;root@ip-172-31-31-150:~/kubernetes-training[root@ip-172-31-31-150 kubernetes-training]# cd 06-storage/
+]0;root@ip-172-31-31-150:~/kubernetes-training/06-storage[root@ip-172-31-31-150 06-storage]# ll
+total 68
+-rw-r--r-- 1 root root 303 Apr 21 05:32 aws-storage-class-ebs.yml
+drwxr-xr-x 2 root root  46 Apr 21 05:32 [0m[01;34mfortune[0m
+-rw-r--r-- 1 root root 424 Apr 21 05:32 fortune-pod.yaml
+-rw-r--r-- 1 root root 428 Apr 21 05:32 gitrepo-volume-pod.yaml
+-rw-r--r-- 1 root root 343 Apr 21 05:32 mongodb-pod-aws.yaml
+-rw-r--r-- 1 root root 333 Apr 21 05:32 mongodb-pod-gcepd.yaml
+-rw-r--r-- 1 root root 308 Apr 21 05:32 mongodb-pod-hostpath.yaml
+-rw-r--r-- 1 root root 326 Apr 21 05:32 mongodb-pod-nfs.yaml
+-rw-r--r-- 1 root root 325 Apr 21 05:32 mongodb-pod-pvc.yaml
+-rw-r--r-- 1 root root 164 Apr 21 05:32 mongodb-pvc-dp-nostorageclass.yaml
+-rw-r--r-- 1 root root 189 Apr 21 05:32 mongodb-pvc-dp.yaml
+-rw-r--r-- 1 root root 182 Apr 21 05:32 mongodb-pvc.yaml
+-rw-r--r-- 1 root root 257 Apr 21 05:32 mongodb-pv-gcepd.yaml
+-rw-r--r-- 1 root root 232 Apr 21 05:32 mongodb-pv-hostpath.yaml
+-rw-r--r-- 1 root root 346 Apr 21 05:32 pod-ebs-vol.yaml
+drwxr-xr-x 2 root root  81 Apr 21 05:32 [01;34mpv_with_labels[0m
+-rw-r--r-- 1 root root 133 Apr 21 05:32 storageclass-fast-gcepd.yaml
+-rw-r--r-- 1 root root 137 Apr 21 05:32 storageclass-fast-hostpath.yaml
+-rw-r--r-- 1 root root 450 Apr 21 05:32 test.yaml
+]0;root@ip-172-31-31-150:~/kubernetes-training/06-storage[root@ip-172-31-31-150 06-storage]# cd ..
+]0;root@ip-172-31-31-150:~/kubernetes-training[root@ip-172-31-31-150 kubernetes-training]# cd ..[3Pllcd 06-storage/[K[K[K[K[K[K[K[K[K[K5-services/
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# ll
+total 72
+-rw-r--r-- 1 root root  161 Apr 21 05:32 external-service-endpoints.yaml
+-rw-r--r-- 1 root root  149 Apr 21 05:32 external-service-externalname.yaml
+-rw-r--r-- 1 root root   93 Apr 21 05:32 external-service.yaml
+drwxr-xr-x 2 root root   96 Apr 21 05:32 [0m[01;34mingress[0m
+-rw-r--r-- 1 root root  302 Apr 21 05:32 kubia-ingress-tls.yaml
+-rw-r--r-- 1 root root  232 Apr 21 05:32 kubia-ingress.yaml
+-rw-r--r-- 1 root root  194 Apr 21 05:32 kubia-pod.yml
+-rw-r--r-- 1 root root  418 Apr 21 05:32 kubia-rc-readinessprobe.yaml
+-rw-r--r-- 1 root root  261 Apr 21 05:32 kubia-replicaset.yaml
+-rw-r--r-- 1 root root  158 Apr 21 05:32 kubia-svc-client-ip-session-affinity.yaml
+-rw-r--r-- 1 root root  157 Apr 21 05:32 kubia-svc-headless.yaml
+-rw-r--r-- 1 root root  164 Apr 21 05:32 kubia-svc-loadbalancer.yaml
+-rw-r--r-- 1 root root  196 Apr 21 05:32 kubia-svc-named-ports.yaml
+-rw-r--r-- 1 root root  217 Apr 21 05:32 kubia-svc-nodeport-onlylocal.yaml
+-rw-r--r-- 1 root root  176 Apr 21 05:32 kubia-svc-nodeport.yaml
+-rw-r--r-- 1 root root  167 Apr 21 05:32 kubia-svc-publish-not-ready.yaml
+-rw-r--r-- 1 root root  156 Apr 21 05:32 kubia-svc.yaml
+-rw-r--r-- 1 root root 1115 Apr 21 05:32 tls.cert
+-rw-r--r-- 1 root root 1675 Apr 21 05:32 tls.key
+]0;root@ip-172-31-31-150:~/kubernetes-training/05-services[root@ip-172-31-31-150 05-services]# cd ..
+]0;root@ip-172-31-31-150:~/kubernetes-training[root@ip-172-31-31-150 kubernetes-training]# ll
+total 132
+-rw-r--r-- 1 root root  2269 Apr 21 05:32 00installation.md
+drwxr-xr-x 3 root root    19 Apr 21 05:32 [0m[01;34m01-Getting-started[0m
+-rw-r--r-- 1 root root  1162 Apr 21 05:32 01gettingstartedWithKube.md
+drwxr-xr-x 2 root root   189 Apr 21 06:12 [01;34m03-Pods[0m
+-rw-r--r-- 1 root root  2446 Apr 21 05:32 03-pods.md
+drwxr-xr-x 5 root root  4096 Apr 28 18:47 [01;34m04-controllers[0m
+-rw-r--r-- 1 root root  1601 Apr 21 05:32 04-controllers.md
+drwxr-xr-x 3 root root  4096 Apr 28 19:05 [01;34m05-services[0m
+-rw-r--r-- 1 root root  2357 Apr 21 05:32 05-services.md
+drwxr-xr-x 4 root root  4096 Apr 21 05:32 [01;34m06-storage[0m
+-rw-r--r-- 1 root root   210 Apr 21 05:32 06-volumes.md
+-rw-r--r-- 1 root root  1028 Apr 21 05:32 07-configmap.md
+drwxr-xr-x 6 root root  4096 Apr 21 05:32 [01;34m07-configmaps-and-secrets[0m
+drwxr-xr-x 3 root root   187 Apr 21 05:32 [01;34m08-metadata[0m
+drwxr-xr-x 6 root root   274 Apr 21 05:32 [01;34m09-deployments[0m
+drwxr-xr-x 4 root root   288 Apr 21 05:32 [01;34m10 Stateful Set[0m
+drwxr-xr-x 2 root root   179 Apr 21 05:32 [01;34m11-RBAC[0m
+drwxr-xr-x 2 root root  4096 Apr 21 05:32 [01;34m12-cluster-admintration[0m
+drwxr-xr-x 4 root root    71 Apr 21 05:32 [01;34m13-networking[0m
+drwxr-xr-x 3 root root  4096 Apr 21 05:32 [01;34m14-security[0m
+drwxr-xr-x 2 root root    59 Apr 21 05:32 [01;34m15-calico[0m
+drwxr-xr-x 2 root root    74 Apr 21 05:32 [01;34m16-dashboard[0m
+-rw-r--r-- 1 root root  1172 Apr 21 05:32 16-dashboard-setup.md
+-rw-r--r-- 1 root root  1263 Apr 21 05:32 Deployments.md
+-rw-r--r-- 1 root root    71 Apr 21 05:32 heapster.md
+drwxr-xr-x 2 root root    82 Apr 21 05:32 [01;34mhelm[0m
+-rw-r--r-- 1 root root 29077 Apr 21 05:32 history.txt
+-rw-r--r-- 1 root root  1273 Apr 21 05:32 ingress.md
+-rw-r--r-- 1 root root   605 Apr 21 05:32 installation-multi-node-master.md
+-rw-r--r-- 1 root root  1956 Apr 21 05:32 Istio-setup.md
+drwxr-xr-x 2 root root  4096 Apr 21 05:32 [01;34mKubernetes-slides[0m
+-rw-r--r-- 1 root root  4476 Apr 21 05:32 kubernetes-troubleshooting.md
+-rw-r--r-- 1 root root   796 Apr 21 05:32 prometheus-setup.md
+-rw-r--r-- 1 root root    43 Apr 21 05:32 README.md
+-rw-r--r-- 1 root root  1078 Apr 21 05:32 Working with MiniKube.md
+]0;root@ip-172-31-31-150:~/kubernetes-training[root@ip-172-31-31-150 kubernetes-training]# cd 09-deployments/
+]0;root@ip-172-31-31-150:~/kubernetes-training/09-deployments[root@ip-172-31-31-150 09-deployments]# ll
+total 24
+-rw-r--r-- 1 root root 435 Apr 21 05:32 kubia-deployment-and-service-v1.yaml
+-rw-r--r-- 1 root root 283 Apr 21 05:32 kubia-deployment-v1.yaml
+-rw-r--r-- 1 root root 269 Apr 21 05:32 kubia-deployment-v2.yaml
+-rw-r--r-- 1 root root 474 Apr 21 05:32 kubia-deployment-v3-with-readinesscheck.yaml
+-rw-r--r-- 1 root root 305 Apr 21 05:32 kubia-deployment-v3.yaml
+-rw-r--r-- 1 root root 400 Apr 21 05:32 kubia-rc-and-service-v1.yaml
+drwxr-xr-x 2 root root  38 Apr 21 05:32 [0m[01;34mv1[0m
+drwxr-xr-x 2 root root  38 Apr 21 05:32 [01;34mv2[0m
+drwxr-xr-x 2 root root  38 Apr 21 05:32 [01;34mv3[0m
+drwxr-xr-x 2 root root  38 Apr 21 05:32 [01;34mv4[0m
+]0;root@ip-172-31-31-150:~/kubernetes-training/09-deployments[root@ip-172-31-31-150 09-deployments]# vi kubia-deployment-and-service-v1.yaml  [A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[K 
+[?1049h[>4;2m[?1h=[?2004h[?1004h[1;24r[?12h[?12l[22;2t[22;1t[27m[23m[29m[m[H[2J[?25l[24;1H"kubia-deployment-and-service-v1.yaml" 30L, 435B[2;1H▽[6n[2;1H  [3;1HPzz\[0%m[6n[3;1H           [1;1H[>c]10;?]11;?[1;1H[36mapiVersion[m[35m:[m apps/v1
+[36mkind[m[35m:[m Deployment[2;17H[K[3;1H[36mmetadata[m[35m:[m[3;10H[K[4;3H[36mname[m[35m:[m kubia
+[36mspec[m[35m:[m
+  [36mselector[m[35m:[m
+    [36mmatchLabels[m[35m:[m[8;7H[36mapp[m[35m:[m kubia
+  [36mreplicas[m[35m:[m [31m3[m
+  [36mtemplate[m[35m:[m
+    [36mmetadata[m[35m:[m[12;7H[36mname[m[35m:[m kubia[13;7H[36mlabels[m[35m:[m[14;9H[36mapp[m[35m:[m kubia
+    [36mspec[m[35m:[m[16;7H[36mcontainers[m[35m:[m[17;7H[33m- [m[36mimage[m[35m:[m luksa/kubia:v1[18;9H[36mname[m[35m:[m nodejs
+[35m---[m
+[36mapiVersion[m[35m:[m v1
+[36mkind[m[35m:[m Service
+[36mmetadata[m[35m:[m
+  [36mname[m[35m:[m kubia[24;63H1,1[11CTop[1;1H[?25h[?25l[24;53H~@k[1;1H[24;53H   [2;1H[24;63H2[2;1H[?25h[?25l[24;53H~@k[2;1H[24;53H   [3;1H[24;63H3[3;1H[?25h[?25l[24;53H~@k[3;1H[24;53H   [4;1H[24;63H4[4;1H[?25h[?25l[24;53Hi[4;1H[24;53H [4;1H[24;1H[1m-- INSERT --[m[24;13H[K[24;63H4,1[11CTop[4;1H[?25h[?25l[24;66H4[4;14H[?25h[?25l-[24;66H5[4;15H[?25h[?25lv[24;66H6[4;16H[?25h[?25lj[24;66H7[4;17H[?25h[24;1H[K[4;16H[?25l[24;53H^[[4;16H[24;53H  [4;17H[24;63H4,16[10CTop[4;16H[?25h[?25l[24;53H:[4;16H[24;53H[K[24;1H:[?25hq[?25l[24;2H[K[24;2H[?25hwq![?25l[?2004l[>4;m"kubia-deployment-and-service-v1.yaml"<-deployment-and-service-v1.yaml" 30L, 438B written[23;2t[23;1t
+[?1004l[?2004l[?1l>[?25h[>4;m[?1049l]0;root@ip-172-31-31-150:~/kubernetes-training/09-deployments[root@ip-172-31-31-150 09-deployments]# vi kubia-deployment-and-service-v1.yaml  [A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cll[K
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ccd 09-deployments/ll[Kcd ..[3Pllcd 05-services/..[K[3Pllcd 06-storage/..[Kkubectl get svcpods[2Pepapply -f kubia-svc-loadbalancer.yyaml .yaml [1P[1P[1P[1P[1P[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C.ya[1P[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C.yam[1P[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C.yaml[1P [A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C.yaml [K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C.yaml  [K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[1P
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[1P[1P[1P[1P[1P[1P[1P[1P[1P[1P[1P[1P[1P[1P[1P[1P[1P[1@ [1@k[1@u[1@b[1@i[1@a[1@-[1@d[1@e[1@p[1@l[1@o[1@y[1@m[1@e[1@n[1@t-.yaml  [A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ca.yaml  [A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cn.yaml [A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cd.yaml [A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C-.ya[1@m[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cs.y[1@a[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ce.[1@y[1@r[1@v[1@i[1@c[1@e[1@-[1@v[1@1
+deployment.apps/kubia-vj created
+service/kubia created
+]0;root@ip-172-31-31-150:~/kubernetes-training/09-deployments[root@ip-172-31-31-150 09-deployments]# kubectl apply -f kubia-deployment-and-serrvice-v1.yaml [A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cvi kubia-deployment-and-service-v1.yaml  [K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cll[K
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ccd 09-deployments/ll[Kcd ..[3Pllcd 05-services/..[K[3Pllcd 06-storage/..[Kkubectl get svc
+NAME                 TYPE           CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
+kubia                ClusterIP      10.99.141.33   <none>        80/TCP         16s
+kubia-loadbalancer   LoadBalancer   10.103.36.50   <pending>     80:32486/TCP   4m51s
+kubia-nodeport       NodePort       10.106.48.24   <none>        80:30123/TCP   10m
+kubia2               ClusterIP      10.99.10.99    <none>        80/TCP         19m
+]0;root@ip-172-31-31-150:~/kubernetes-training/09-deployments[root@ip-172-31-31-150 09-deployments]# kubectl get svc[K[K[Krc
+NAME        DESIRED   CURRENT   READY   AGE
+kubia2-vj   3         3         3       48m
+]0;root@ip-172-31-31-150:~/kubernetes-training/09-deployments[root@ip-172-31-31-150 09-deployments]# kubectl get rc[Ks
+NAME                  DESIRED   CURRENT   READY   AGE
+kubia-vj              3         3         3       44m
+kubia-vj-59d857b444   3         3         2       37s
+]0;root@ip-172-31-31-150:~/kubernetes-training/09-deployments[root@ip-172-31-31-150 09-deployments]# kubectl get rs[K[K[K pods
+NAME                        READY   STATUS    RESTARTS   AGE
+kubia-vj-59d857b444-btvmx   1/1     Running   0          55s
+kubia-vj-59d857b444-cr2jt   1/1     Running   0          55s
+kubia-vj-59d857b444-lpzj7   1/1     Running   0          55s
+kubia-vj-k4rsk              1/1     Running   0          44m
+kubia-vj-pt2lf              1/1     Running   0          33m
+kubia-vj-rhcq2              1/1     Running   0          44m
+kubia-vj-t2clw              1/1     Running   0          43m
+kubia2-vj-j2g25             1/1     Running   0          49m
+kubia2-vj-l8nlf             1/1     Running   0          30m
+kubia2-vj-nmlhz             1/1     Running   0          30m
+]0;root@ip-172-31-31-150:~/kubernetes-training/09-deployments[root@ip-172-31-31-150 09-deployments]# kubectl get pods[K[K[K[Kdeploy
+NAME       READY   UP-TO-DATE   AVAILABLE   AGE
+kubia-vj   3/3     3            3           73s
+]0;root@ip-172-31-31-150:~/kubernetes-training/09-deployments[root@ip-172-31-31-150 09-deployments]# kubectl get deploy[2Ppods[2Prscsvcapply -f kubia-deployment-and-serrvice-v1.yaml [A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cvi kubia-deployment-and-service-v1.yaml  [K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cll[K
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ccd 09-deployments/ll[Kcd 09-deployments/ll[Kvi kubia-deployment-and-service-v1.yaml  [A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ckubectl apply -f kubia-deployment-and-serrvice-v1.yaml [A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cget svc[K
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Capply -f kubia-deployment-and-serrvice-v1.yaml [A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cvi kubia-deployment-and-service-v1.yaml  [K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cll[K
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ccd 09-deployments/ll[Kcd ..[3Pllcd 05-services/ll[K[K[Kkubectl describe deploy kubia
+Name:                   kubia-vj
+Namespace:              vj
+CreationTimestamp:      Thu, 28 Apr 2022 19:11:15 +0000
+Labels:                 <none>
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=kubia
+Replicas:               3 desired | 3 updated | 3 total | 3 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=kubia
+  Containers:
+   nodejs:
+    Image:        luksa/kubia:v1
+    Port:         <none>
+    Host Port:    <none>
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   kubia-vj-59d857b444 (3/3 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  116s  deployment-controller  Scaled up replica set kubia-vj-59d857b444 to 3
+
+]0;root@ip-172-31-31-150:~/kubernetes-training/09-deployments[root@ip-172-31-31-150 09-deployments]# kubectl describe deploy kubia[1P kubia[1P kubia[1P kubia[1P kubia[1P kubia[1P kubias kubiav kubiac kubia
+Name:              kubia
+Namespace:         vj
+Labels:            <none>
+Annotations:       Selector:  app=kubia
+Type:              ClusterIP
+IP:                10.99.141.33
+Port:              <unset>  80/TCP
+TargetPort:        8080/TCP
+Endpoints:         192.168.1.103:8080,192.168.1.104:8080,192.168.1.105:8080 + 6 more...
+Session Affinity:  None
+Events:            <none>
+]0;root@ip-172-31-31-150:~/kubernetes-training/09-deployments[root@ip-172-31-31-150 09-deployments]# kubectl describe svc kubia[1P kubia[1P kubia[1P kubiar kubias kubia
+Name:         kubia-vj
+Namespace:    vj
+Selector:     app=kubia
+Labels:       <none>
+Annotations:  Replicas:  3 current / 3 desired
+Pods Status:  3 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:  app=kubia
+           nickname=superstar
+  Containers:
+   kubia:
+    Image:        luksa/kubia
+    Port:         <none>
+    Host Port:    <none>
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Events:
+  Type    Reason            Age   From                   Message
+  ----    ------            ----  ----                   -------
+  Normal  SuccessfulCreate  46m   replicaset-controller  Created pod: kubia-vj-k4rsk
+  Normal  SuccessfulCreate  46m   replicaset-controller  Created pod: kubia-vj-bskbm
+  Normal  SuccessfulCreate  46m   replicaset-controller  Created pod: kubia-vj-rhcq2
+  Normal  SuccessfulCreate  45m   replicaset-controller  Created pod: kubia-vj-t2clw
+  Normal  SuccessfulCreate  35m   replicaset-controller  Created pod: kubia-vj-pt2lf
+
+Name:           kubia-vj-59d857b444
+Namespace:      vj
+Selector:       app=kubia,pod-template-hash=59d857b444
+Labels:         app=kubia
+                pod-template-hash=59d857b444
+Annotations:    deployment.kubernetes.io/desired-replicas: 3
+                deployment.kubernetes.io/max-replicas: 4
+                deployment.kubernetes.io/revision: 1
+Controlled By:  Deployment/kubia-vj
+Replicas:       3 current / 3 desired
+Pods Status:    3 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:  app=kubia
+           pod-template-hash=59d857b444
+  Containers:
+   nodejs:
+    Image:        luksa/kubia:v1
+    Port:         <none>
+    Host Port:    <none>
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Events:
+  Type    Reason            Age    From                   Message
+  ----    ------            ----   ----                   -------
+  Normal  SuccessfulCreate  2m32s  replicaset-controller  Created pod: kubia-vj-59d857b444-cr2jt
+  Normal  SuccessfulCreate  2m32s  replicaset-controller  Created pod: kubia-vj-59d857b444-lpzj7
+  Normal  SuccessfulCreate  2m32s  replicaset-controller  Created pod: kubia-vj-59d857b444-btvmx
+
+]0;root@ip-172-31-31-150:~/kubernetes-training/09-deployments[root@ip-172-31-31-150 09-deployments]# kubectl describe rs kubia[1P kubiac kubia
+Name:         kubia2-vj
+Namespace:    vj
+Selector:     app=kubia
+Labels:       app=kubia
+Annotations:  Replicas:  3 current / 3 desired
+Pods Status:  3 Running / 0 Waiting / 0 Succeeded / 0 Failed
+Pod Template:
+  Labels:  app=kubia
+           nickname=megastar
+  Containers:
+   kubia:
+    Image:        luksa/kubia
+    Port:         8080/TCP
+    Host Port:    0/TCP
+    Environment:  <none>
+    Mounts:       <none>
+  Volumes:        <none>
+Events:
+  Type    Reason            Age   From                    Message
+  ----    ------            ----  ----                    -------
+  Normal  SuccessfulCreate  50m   replication-controller  Created pod: kubia2-vj-j2g25
+  Normal  SuccessfulCreate  50m   replication-controller  Created pod: kubia2-vj-d4fx5
+  Normal  SuccessfulCreate  50m   replication-controller  Created pod: kubia2-vj-nx7ns
+  Normal  SuccessfulCreate  49m   replication-controller  Created pod: kubia2-vj-dqn9h
+  Normal  SuccessfulDelete  47m   replication-controller  Deleted pod: kubia2-vj-nx7ns
+  Normal  SuccessfulDelete  47m   replication-controller  Deleted pod: kubia2-vj-dqn9h
+  Normal  SuccessfulCreate  32m   replication-controller  Created pod: kubia2-vj-l8nlf
+  Normal  SuccessfulCreate  32m   replication-controller  Created pod: kubia2-vj-6j4pr
+  Normal  SuccessfulCreate  32m   replication-controller  Created pod: kubia2-vj-nmlhz
+  Normal  SuccessfulCreate  32m   replication-controller  Created pod: kubia2-vj-jlwqr
+  Normal  SuccessfulDelete  26m   replication-controller  Deleted pod: kubia2-vj-6j4pr
+  Normal  SuccessfulDelete  26m   replication-controller  Deleted pod: kubia2-vj-jlwqr
+
+]0;root@ip-172-31-31-150:~/kubernetes-training/09-deployments[root@ip-172-31-31-150 09-deployments]# kubectl describe rc kubia[1P kubia[1P kubiap kubiao kubiad kubia
+Name:         kubia-vj-59d857b444-btvmx
+Namespace:    vj
+Priority:     0
+Node:         ip-172-31-31-150.ap-southeast-1.compute.internal/172.31.31.150
+Start Time:   Thu, 28 Apr 2022 19:11:15 +0000
+Labels:       app=kubia
+              pod-template-hash=59d857b444
+Annotations:  <none>
+Status:       Running
+IP:           192.168.1.108
+IPs:
+  IP:           192.168.1.108
+Controlled By:  ReplicaSet/kubia-vj-59d857b444
+Containers:
+  nodejs:
+    Container ID:   docker://a2f511258397b203f0e79b4ff5db908c19d9f2a43c3b5f2080a0d6dd282be4fb
+    Image:          luksa/kubia:v1
+    Image ID:       docker-pullable://luksa/kubia@sha256:259e3d728621f001a629a5fe4b56020d0a14e239b0ea82727c1398f155c75a5d
+    Port:           <none>
+    Host Port:      <none>
+    State:          Running
+      Started:      Thu, 28 Apr 2022 19:11:50 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-wt25g (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  default-token-wt25g:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-wt25g
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type    Reason     Age        From                                                       Message
+  ----    ------     ----       ----                                                       -------
+  Normal  Scheduled  <unknown>  default-scheduler                                          Successfully assigned vj/kubia-vj-59d857b444-btvmx to ip-172-31-31-150.ap-southeast-1.compute.internal
+  Normal  Pulling    2m49s      kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Pulling image "luksa/kubia:v1"
+  Normal  Pulled     2m16s      kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Successfully pulled image "luksa/kubia:v1"
+  Normal  Created    2m16s      kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Created container nodejs
+  Normal  Started    2m16s      kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Started container nodejs
+
+Name:         kubia-vj-59d857b444-cr2jt
+Namespace:    vj
+Priority:     0
+Node:         ip-172-31-31-150.ap-southeast-1.compute.internal/172.31.31.150
+Start Time:   Thu, 28 Apr 2022 19:11:15 +0000
+Labels:       app=kubia
+              pod-template-hash=59d857b444
+Annotations:  <none>
+Status:       Running
+IP:           192.168.1.109
+IPs:
+  IP:           192.168.1.109
+Controlled By:  ReplicaSet/kubia-vj-59d857b444
+Containers:
+  nodejs:
+    Container ID:   docker://db2661a1e9391d198a9a0ddbdee36f9e20271e8bcfd17db204fe29e924158623
+    Image:          luksa/kubia:v1
+    Image ID:       docker-pullable://luksa/kubia@sha256:259e3d728621f001a629a5fe4b56020d0a14e239b0ea82727c1398f155c75a5d
+    Port:           <none>
+    Host Port:      <none>
+    State:          Running
+      Started:      Thu, 28 Apr 2022 19:11:47 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-wt25g (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  default-token-wt25g:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-wt25g
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type    Reason     Age        From                                                       Message
+  ----    ------     ----       ----                                                       -------
+  Normal  Scheduled  <unknown>  default-scheduler                                          Successfully assigned vj/kubia-vj-59d857b444-cr2jt to ip-172-31-31-150.ap-southeast-1.compute.internal
+  Normal  Pulling    2m50s      kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Pulling image "luksa/kubia:v1"
+  Normal  Pulled     2m19s      kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Successfully pulled image "luksa/kubia:v1"
+  Normal  Created    2m19s      kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Created container nodejs
+  Normal  Started    2m19s      kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Started container nodejs
+
+Name:         kubia-vj-59d857b444-lpzj7
+Namespace:    vj
+Priority:     0
+Node:         ip-172-31-31-150.ap-southeast-1.compute.internal/172.31.31.150
+Start Time:   Thu, 28 Apr 2022 19:11:15 +0000
+Labels:       app=kubia
+              pod-template-hash=59d857b444
+Annotations:  <none>
+Status:       Running
+IP:           192.168.1.110
+IPs:
+  IP:           192.168.1.110
+Controlled By:  ReplicaSet/kubia-vj-59d857b444
+Containers:
+  nodejs:
+    Container ID:   docker://88e3f54e3cb6e91527e510bf0b3af7085e88ca485009705d208da2751d979669
+    Image:          luksa/kubia:v1
+    Image ID:       docker-pullable://luksa/kubia@sha256:259e3d728621f001a629a5fe4b56020d0a14e239b0ea82727c1398f155c75a5d
+    Port:           <none>
+    Host Port:      <none>
+    State:          Running
+      Started:      Thu, 28 Apr 2022 19:11:53 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-wt25g (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  default-token-wt25g:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-wt25g
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type    Reason     Age        From                                                       Message
+  ----    ------     ----       ----                                                       -------
+  Normal  Scheduled  <unknown>  default-scheduler                                          Successfully assigned vj/kubia-vj-59d857b444-lpzj7 to ip-172-31-31-150.ap-southeast-1.compute.internal
+  Normal  Pulling    2m49s      kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Pulling image "luksa/kubia:v1"
+  Normal  Pulled     2m13s      kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Successfully pulled image "luksa/kubia:v1"
+  Normal  Created    2m13s      kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Created container nodejs
+  Normal  Started    2m13s      kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Started container nodejs
+
+Name:         kubia-vj-k4rsk
+Namespace:    vj
+Priority:     0
+Node:         ip-172-31-31-150.ap-southeast-1.compute.internal/172.31.31.150
+Start Time:   Thu, 28 Apr 2022 18:27:14 +0000
+Labels:       app=vj
+Annotations:  <none>
+Status:       Running
+IP:           192.168.1.101
+IPs:
+  IP:  192.168.1.101
+Containers:
+  kubia:
+    Container ID:   docker://b68eb3ea237bf83effa1b0f6054375cf0941138771af22a4f5427b92bf3780f0
+    Image:          luksa/kubia
+    Image ID:       docker-pullable://luksa/kubia@sha256:3f28e304dc0f63dc30f273a4202096f0fa0d08510bd2ee7e1032ce600616de24
+    Port:           <none>
+    Host Port:      <none>
+    State:          Running
+      Started:      Thu, 28 Apr 2022 18:27:18 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-wt25g (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  default-token-wt25g:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-wt25g
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type    Reason     Age        From                                                       Message
+  ----    ------     ----       ----                                                       -------
+  Normal  Scheduled  <unknown>  default-scheduler                                          Successfully assigned vj/kubia-vj-k4rsk to ip-172-31-31-150.ap-southeast-1.compute.internal
+  Normal  Pulling    46m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Pulling image "luksa/kubia"
+  Normal  Pulled     46m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Successfully pulled image "luksa/kubia"
+  Normal  Created    46m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Created container kubia
+  Normal  Started    46m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Started container kubia
+
+Name:         kubia-vj-pt2lf
+Namespace:    vj
+Priority:     0
+Node:         ip-172-31-31-150.ap-southeast-1.compute.internal/172.31.31.150
+Start Time:   Thu, 28 Apr 2022 18:38:28 +0000
+Labels:       app=kubia
+Annotations:  <none>
+Status:       Running
+IP:           192.168.1.95
+IPs:
+  IP:           192.168.1.95
+Controlled By:  ReplicaSet/kubia-vj
+Containers:
+  kubia:
+    Container ID:   docker://dc6bf0411fa05d8241b0550d42ad5e0ec327a8e084e2a5a3aad82e5f2c9113b4
+    Image:          luksa/kubia
+    Image ID:       docker-pullable://luksa/kubia@sha256:3f28e304dc0f63dc30f273a4202096f0fa0d08510bd2ee7e1032ce600616de24
+    Port:           <none>
+    Host Port:      <none>
+    State:          Running
+      Started:      Thu, 28 Apr 2022 18:38:32 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-wt25g (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  default-token-wt25g:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-wt25g
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type    Reason     Age        From                                                       Message
+  ----    ------     ----       ----                                                       -------
+  Normal  Scheduled  <unknown>  default-scheduler                                          Successfully assigned vj/kubia-vj-pt2lf to ip-172-31-31-150.ap-southeast-1.compute.internal
+  Normal  Pulling    35m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Pulling image "luksa/kubia"
+  Normal  Pulled     35m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Successfully pulled image "luksa/kubia"
+  Normal  Created    35m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Created container kubia
+  Normal  Started    35m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Started container kubia
+
+Name:         kubia-vj-rhcq2
+Namespace:    vj
+Priority:     0
+Node:         ip-172-31-31-150.ap-southeast-1.compute.internal/172.31.31.150
+Start Time:   Thu, 28 Apr 2022 18:27:14 +0000
+Labels:       app=kubia
+Annotations:  <none>
+Status:       Running
+IP:           192.168.1.103
+IPs:
+  IP:           192.168.1.103
+Controlled By:  ReplicaSet/kubia-vj
+Containers:
+  kubia:
+    Container ID:   docker://143049195c7fa41f25e205afafb886f94467e1a7110f10fed5e9c44b151a6fba
+    Image:          luksa/kubia
+    Image ID:       docker-pullable://luksa/kubia@sha256:3f28e304dc0f63dc30f273a4202096f0fa0d08510bd2ee7e1032ce600616de24
+    Port:           <none>
+    Host Port:      <none>
+    State:          Running
+      Started:      Thu, 28 Apr 2022 18:27:24 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-wt25g (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  default-token-wt25g:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-wt25g
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type    Reason     Age        From                                                       Message
+  ----    ------     ----       ----                                                       -------
+  Normal  Scheduled  <unknown>  default-scheduler                                          Successfully assigned vj/kubia-vj-rhcq2 to ip-172-31-31-150.ap-southeast-1.compute.internal
+  Normal  Pulling    46m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Pulling image "luksa/kubia"
+  Normal  Pulled     46m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Successfully pulled image "luksa/kubia"
+  Normal  Created    46m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Created container kubia
+  Normal  Started    46m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Started container kubia
+
+Name:         kubia-vj-t2clw
+Namespace:    vj
+Priority:     0
+Node:         ip-172-31-31-150.ap-southeast-1.compute.internal/172.31.31.150
+Start Time:   Thu, 28 Apr 2022 18:28:30 +0000
+Labels:       app=kubia
+Annotations:  <none>
+Status:       Running
+IP:           192.168.1.104
+IPs:
+  IP:           192.168.1.104
+Controlled By:  ReplicaSet/kubia-vj
+Containers:
+  kubia:
+    Container ID:   docker://834400c3e08526c6266f08382a653141d2698b7f205ec61b73aba6526056d700
+    Image:          luksa/kubia
+    Image ID:       docker-pullable://luksa/kubia@sha256:3f28e304dc0f63dc30f273a4202096f0fa0d08510bd2ee7e1032ce600616de24
+    Port:           <none>
+    Host Port:      <none>
+    State:          Running
+      Started:      Thu, 28 Apr 2022 18:28:34 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-wt25g (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  default-token-wt25g:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-wt25g
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type    Reason     Age        From                                                       Message
+  ----    ------     ----       ----                                                       -------
+  Normal  Scheduled  <unknown>  default-scheduler                                          Successfully assigned vj/kubia-vj-t2clw to ip-172-31-31-150.ap-southeast-1.compute.internal
+  Normal  Pulling    45m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Pulling image "luksa/kubia"
+  Normal  Pulled     45m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Successfully pulled image "luksa/kubia"
+  Normal  Created    45m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Created container kubia
+  Normal  Started    45m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Started container kubia
+
+Name:         kubia2-vj-j2g25
+Namespace:    vj
+Priority:     0
+Node:         ip-172-31-31-150.ap-southeast-1.compute.internal/172.31.31.150
+Start Time:   Thu, 28 Apr 2022 18:23:05 +0000
+Labels:       app=kubia
+Annotations:  <none>
+Status:       Running
+IP:           192.168.1.93
+IPs:
+  IP:           192.168.1.93
+Controlled By:  ReplicationController/kubia2-vj
+Containers:
+  kubia:
+    Container ID:   docker://660704963dc97e525287cbf822f1b23c5241cf3817283009e77741ae76b86949
+    Image:          luksa/kubia
+    Image ID:       docker-pullable://luksa/kubia@sha256:3f28e304dc0f63dc30f273a4202096f0fa0d08510bd2ee7e1032ce600616de24
+    Port:           8080/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Thu, 28 Apr 2022 18:23:10 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-wt25g (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  default-token-wt25g:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-wt25g
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type    Reason     Age        From                                                       Message
+  ----    ------     ----       ----                                                       -------
+  Normal  Scheduled  <unknown>  default-scheduler                                          Successfully assigned vj/kubia2-vj-j2g25 to ip-172-31-31-150.ap-southeast-1.compute.internal
+  Normal  Pulling    51m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Pulling image "luksa/kubia"
+  Normal  Pulled     50m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Successfully pulled image "luksa/kubia"
+  Normal  Created    50m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Created container kubia
+  Normal  Started    50m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Started container kubia
+
+Name:         kubia2-vj-l8nlf
+Namespace:    vj
+Priority:     0
+Node:         ip-172-31-31-150.ap-southeast-1.compute.internal/172.31.31.150
+Start Time:   Thu, 28 Apr 2022 18:41:54 +0000
+Labels:       app=kubia
+Annotations:  <none>
+Status:       Running
+IP:           192.168.1.94
+IPs:
+  IP:           192.168.1.94
+Controlled By:  ReplicationController/kubia2-vj
+Containers:
+  kubia:
+    Container ID:   docker://21c974791b6ccd9a3e2f2271d5dc22e5bb40d10346386d74e6e2283b33eb4f52
+    Image:          luksa/kubia
+    Image ID:       docker-pullable://luksa/kubia@sha256:3f28e304dc0f63dc30f273a4202096f0fa0d08510bd2ee7e1032ce600616de24
+    Port:           8080/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Thu, 28 Apr 2022 18:41:58 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-wt25g (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  default-token-wt25g:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-wt25g
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type    Reason     Age        From                                                       Message
+  ----    ------     ----       ----                                                       -------
+  Normal  Scheduled  <unknown>  default-scheduler                                          Successfully assigned vj/kubia2-vj-l8nlf to ip-172-31-31-150.ap-southeast-1.compute.internal
+  Normal  Pulling    32m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Pulling image "luksa/kubia"
+  Normal  Pulled     32m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Successfully pulled image "luksa/kubia"
+  Normal  Created    32m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Created container kubia
+  Normal  Started    32m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Started container kubia
+
+Name:         kubia2-vj-nmlhz
+Namespace:    vj
+Priority:     0
+Node:         ip-172-31-31-150.ap-southeast-1.compute.internal/172.31.31.150
+Start Time:   Thu, 28 Apr 2022 18:41:54 +0000
+Labels:       app=kubia
+Annotations:  <none>
+Status:       Running
+IP:           192.168.1.105
+IPs:
+  IP:           192.168.1.105
+Controlled By:  ReplicationController/kubia2-vj
+Containers:
+  kubia:
+    Container ID:   docker://22661b49e3c1df4570f22e2ef522566afaa27915a90726d2711455cb65c53af3
+    Image:          luksa/kubia
+    Image ID:       docker-pullable://luksa/kubia@sha256:3f28e304dc0f63dc30f273a4202096f0fa0d08510bd2ee7e1032ce600616de24
+    Port:           8080/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Thu, 28 Apr 2022 18:42:01 +0000
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-wt25g (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  default-token-wt25g:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-wt25g
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type    Reason     Age        From                                                       Message
+  ----    ------     ----       ----                                                       -------
+  Normal  Scheduled  <unknown>  default-scheduler                                          Successfully assigned vj/kubia2-vj-nmlhz to ip-172-31-31-150.ap-southeast-1.compute.internal
+  Normal  Pulling    32m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Pulling image "luksa/kubia"
+  Normal  Pulled     32m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Successfully pulled image "luksa/kubia"
+  Normal  Created    32m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Created container kubia
+  Normal  Started    32m        kubelet, ip-172-31-31-150.ap-southeast-1.compute.internal  Started container kubia
+
+]0;root@ip-172-31-31-150:~/kubernetes-training/09-deployments[root@ip-172-31-31-150 09-deployments]# logout
+]0;ec2-user@ip-172-31-31-150:~[ec2-user@ip-172-31-31-150 ~]$ logout
